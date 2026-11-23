@@ -1,133 +1,122 @@
-<!-- ===== 文章区域：树状分类可视化（默认可见） ===== -->
-<main class="articles-main">
-    <div class="articles-header">
+<%
+    const { categories, articles } = archive_articles(page.posts);
+    const archiveUrl = url_for(config.archive_dir + '/');
+    const scoped = is_category() || is_tag() || page.year;
+    const heading = is_category() ? page.category : is_tag() ? page.tag :
+        [page.year, page.month, page.day].filter(Boolean).join(' / ');
+    const illustrations = [
+        ['card-size-lg', '', '#667eea, #764ba2', 'fa-laptop-code'],
+        ['card-size-md', 'card-offset-right', '#f093fb, #f5576c', 'fa-camera-retro'],
+        ['card-size-sm', '', '#4facfe, #00f2fe', 'fa-brain'],
+        ['card-size-md', '', '#a18cd1, #fbc2eb', 'fa-graduation-cap'],
+        ['card-size-sm', 'card-offset-left', '#fa709a, #fee140', 'fa-cloud'],
+        ['card-size-lg', '', '#5ee7df, #b490ca', 'fa-book-open']
+    ];
+%>
+<main class="articles-main" data-article-archive>
+    <header class="articles-header">
         <div class="articles-title-block">
             <h1 class="articles-big-title">
-                <span class="art-title-pre">最新</span>
-                <span class="art-title-main">文章</span>
+                <% if (scoped) { %>
+                    <span class="art-title-main"><%= heading %></span>
+                <% } else { %>
+                    <span class="art-title-pre">最新</span>
+                    <span class="art-title-main">文章</span>
+                <% } %>
             </h1>
-            <p class="articles-subtitle">探索技术深度，分享生活温度</p>
+            <% if (scoped) { %>
+                <a href="<%= archiveUrl %>">查看所有文章</a>
+            <% } else { %>
+                <p class="articles-subtitle">探索技术深度，分享生活温度</p>
+            <% } %>
         </div>
-    </div>
+    </header>
 
-    <!-- 树状分类系统 -->
-    <div class="articles-tree-container" id="articlesTree">
-        <svg class="tree-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
-            <path class="tree-trunk" d="M 120 720 Q 280 530, 430 380 Q 520 290, 600 180"/>
-            <path class="tree-branch" data-branch="tech" d="M 365 495 Q 480 450, 600 435"/>
-            <path class="tree-branch" data-branch="life" d="M 435 380 Q 340 310, 220 275"/>
-            <path class="tree-branch" data-branch="thought" d="M 525 260 Q 640 210, 750 195"/>
-            <path class="tree-branch" data-branch="tutorial" d="M 575 195 Q 500 130, 390 105"/>
-            <circle class="tree-node tree-node-root" cx="120" cy="720" r="4"/>
-            <circle class="tree-node tree-node-tip" cx="600" cy="180" r="3"/>
-        </svg>
-        <button class="btn-glass tree-tag-btn" data-category="tech" style="--btn-x:68%;--btn-y:46%;"><i class="fas fa-laptop-code"></i> <span>技术</span></button>
-        <button class="btn-glass tree-tag-btn" data-category="life" style="--btn-x:14%;--btn-y:27%;"><i class="fas fa-heart"></i> <span>生活</span></button>
-        <button class="btn-glass tree-tag-btn" data-category="thought" style="--btn-x:82%;--btn-y:17%;"><i class="fas fa-lightbulb"></i> <span>思考</span></button>
-        <button class="btn-glass tree-tag-btn" data-category="tutorial" style="--btn-x:32%;--btn-y:6%;"><i class="fas fa-graduation-cap"></i> <span>教程</span></button>
-
-        <!-- 水珠面板：技术 -->
-        <div class="tree-droplet" data-category="tech" id="droplet-tech">
-            <div class="droplet-inner">
-                <div class="droplet-articles">
-                    <div class="droplet-article"><span class="droplet-title">深入理解 JavaScript 异步编程</span><span class="droplet-keywords"><span class="kw-tag">async/await</span><span class="kw-tag">Promise</span></span></div>
-                    <div class="droplet-article"><span class="droplet-title">WebAssembly 入门与实践指南</span><span class="droplet-keywords"><span class="kw-tag">WASM</span><span class="kw-tag">性能优化</span></span></div>
-                    <div class="droplet-article"><span class="droplet-title">Docker 容器化部署最佳实践</span><span class="droplet-keywords"><span class="kw-tag">Docker</span><span class="kw-tag">DevOps</span></span></div>
-                </div>
-            </div>
-        </div>
-        <!-- 水珠面板：生活 -->
-        <div class="tree-droplet" data-category="life" id="droplet-life">
-            <div class="droplet-inner">
-                <div class="droplet-articles">
-                    <div class="droplet-article"><span class="droplet-title">2026 上半年读书清单与推荐</span><span class="droplet-keywords"><span class="kw-tag">阅读</span><span class="kw-tag">书单</span></span></div>
-                    <div class="droplet-article"><span class="droplet-title">远程办公两年后的思考</span><span class="droplet-keywords"><span class="kw-tag">远程工作</span><span class="kw-tag">生活方式</span></span></div>
-                </div>
-            </div>
-        </div>
-        <!-- 水珠面板：思考 -->
-        <div class="tree-droplet" data-category="thought" id="droplet-thought">
-            <div class="droplet-inner">
-                <div class="droplet-articles">
-                    <div class="droplet-article"><span class="droplet-title">技术与人文的交汇点</span><span class="droplet-keywords"><span class="kw-tag">哲学</span><span class="kw-tag">技术伦理</span></span></div>
-                    <div class="droplet-article"><span class="droplet-title">AI 时代程序员的自我修养</span><span class="droplet-keywords"><span class="kw-tag">AI</span><span class="kw-tag">职业发展</span></span></div>
-                </div>
-            </div>
-        </div>
-        <!-- 水珠面板：教程 -->
-        <div class="tree-droplet" data-category="tutorial" id="droplet-tutorial">
-            <div class="droplet-inner">
-                <div class="droplet-articles">
-                    <div class="droplet-article"><span class="droplet-title">从零开始：用 Three.js 构建 3D 交互页面</span><span class="droplet-keywords"><span class="kw-tag">Three.js</span><span class="kw-tag">3D</span></span></div>
-                    <div class="droplet-article"><span class="droplet-title">React 18 新特性全面解析</span><span class="droplet-keywords"><span class="kw-tag">React</span><span class="kw-tag">前端</span></span></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <style>.page-articles main+main,.page-articles main~.articles-waterfall{display:none!important}</style>
-</main>
-
-<!-- ===== 文章区域：筛选 + 瀑布流文章卡片（默认隐藏） ===== -->
-<main class="articles-main">
-    <div class="articles-header">
-        <div class="articles-title-block">
-            <h1 class="articles-big-title">
-                <span class="art-title-pre">最新</span>
-                <span class="art-title-main">文章</span>
-            </h1>
-            <p class="articles-subtitle">探索技术深度，分享生活温度</p>
-        </div>
-
-            <button class="btn-glass filter-pill active" data-filter="all">
-                <i class="fas fa-globe-asia"></i> 全部
-            </button>
-            <button class="btn-glass filter-pill" data-filter="tech">
-                <i class="fas fa-laptop-code"></i> 技术
-            </button>
-            <button class="btn-glass filter-pill" data-filter="life">
-                <i class="fas fa-camera-retro"></i> 生活
-            </button>
-            <button class="btn-glass filter-pill" data-filter="thought">
-                <i class="fas fa-brain"></i> 思考
-            </button>
-            <button class="btn-glass filter-pill" data-filter="tutorial">
-                <i class="fas fa-graduation-cap"></i> 教程
-            </button>
-        </div>
-    </div>
-
-    <div class="articles-waterfall">
-        <% page.posts.each(function(post, i){ %>
-            <% var sizes = ['card-size-lg', 'card-size-md', 'card-size-sm', 'card-size-md', 'card-size-sm', 'card-size-lg']; %>
-            <% var offsets = ['', 'card-offset-right', '', '', 'card-offset-left', '']; %>
-            <% var gradients = [
-                'linear-gradient(135deg, #667eea, #764ba2)',
-                'linear-gradient(135deg, #f093fb, #f5576c)',
-                'linear-gradient(135deg, #4facfe, #00f2fe)',
-                'linear-gradient(135deg, #a18cd1, #fbc2eb)',
-                'linear-gradient(135deg, #fa709a, #fee140)',
-                'linear-gradient(135deg, #5ee7df, #b490ca)'
-            ]; %>
-            <% var icons = ['fa-laptop-code', 'fa-camera-retro', 'fa-brain', 'fa-graduation-cap', 'fa-cloud', 'fa-book-open']; %>
-            <% var categories = post.categories && post.categories.length ? post.categories.map(function(c){ return c.name; }).join(', ') : '未分类'; %>
-            <% var catFirst = post.categories && post.categories.first ? post.categories.first.name : 'uncategorized'; %>
-            <% var idx = i % sizes.length; %>
-            <article class="article-card-waterfall <%- sizes[idx] %> <%- offsets[idx] %>" data-category="<%- catFirst %>">
-                <div class="card-glass-surface">
-                    <div class="card-glass-image" style="--card-gradient: <%- gradients[idx] %>;">
-                        <i class="fas <%- icons[idx] %>"></i>
+    <% if (articles.length) { %>
+        <section class="articles-tree-container" id="articlesTree" aria-label="树状文章分类" hidden>
+            <svg class="tree-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <path class="tree-trunk" d="M 120 720 Q 280 530, 430 380 Q 520 290, 600 180"/>
+                <path class="tree-branch" data-branch="tech" d="M 365 495 Q 480 450, 600 435"/>
+                <path class="tree-branch" data-branch="life" d="M 435 380 Q 340 310, 220 275"/>
+                <path class="tree-branch" data-branch="thought" d="M 525 260 Q 640 210, 750 195"/>
+                <path class="tree-branch" data-branch="tutorial" d="M 575 195 Q 500 130, 390 105"/>
+                <circle class="tree-node tree-node-root" cx="120" cy="720" r="4"/>
+                <circle class="tree-node tree-node-tip" cx="600" cy="180" r="3"/>
+            </svg>
+            <% for (const category of categories.filter(category => category.position)) { %>
+                <div class="tree-category" data-category="<%= category.key %>" style="<%= category.position %>">
+                    <button type="button" class="btn-glass tree-tag-btn" data-category="<%= category.key %>"
+                        aria-expanded="false" aria-controls="droplet-<%= category.key %>">
+                        <i class="fas <%= category.icon %>" aria-hidden="true"></i> <%= category.label %>
+                    </button>
+                    <div class="tree-droplet glass-card" id="droplet-<%= category.key %>" hidden>
+                        <% const posts = articles.filter(article => article.groups.includes(category.key)); %>
+                        <% if (posts.length) { %>
+                            <ul class="droplet-articles">
+                                <% for (const article of posts) { %>
+                                    <li class="droplet-article">
+                                        <a class="droplet-title" href="<%= url_for(article.post.path) %>"><%= article.post.title %></a>
+                                        <time datetime="<%= article.date %>"><%= article.date %></time>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        <% } else { %>
+                            <p>本页暂无<%= category.label %>文章。</p>
+                        <% } %>
                     </div>
-                    <div class="card-glass-body">
-                        <span class="card-glass-category"><%= categories %></span>
-                        <div class="card-glass-meta">
-                            <span><i class="far fa-calendar-alt"></i> <%- date(post.date, 'YYYY-MM-DD') %></span>
+                </div>
+            <% } %>
+        </section>
+
+        <div class="archive-filters" role="group" aria-label="筛选本页文章" hidden>
+            <% for (const category of categories) { %>
+                <button type="button" class="btn-glass filter-pill<%= category.key === 'all' ? ' active' : '' %>"
+                    data-filter="<%= category.key %>" aria-controls="articleCards"
+                    aria-pressed="<%= category.key === 'all' %>">
+                    <i class="fas <%= category.icon %>" aria-hidden="true"></i> <%= category.label %>
+                </button>
+            <% } %>
+        </div>
+        <p class="archive-empty" role="status" data-filter-empty hidden>本页没有符合此分类的文章。</p>
+
+        <div class="articles-waterfall" id="articleCards">
+            <% articles.forEach(({ post, groups, names, summary, date }, index) => {
+                const [size, offset, gradient, icon] = illustrations[index % illustrations.length];
+            %>
+                <article class="article-card-waterfall <%= size %> <%= offset %>" data-category="<%= groups.join(' ') %>">
+                    <div class="card-glass-surface">
+                        <div class="card-glass-image" style="--card-gradient: linear-gradient(135deg, <%= gradient %>);" aria-hidden="true">
+                            <i class="fas <%= icon %>"></i>
                         </div>
-                        <h3><%= post.title %></h3>
-                        <p><%- post.excerpt ? post.excerpt : post.content.substring(0, 150) + '...' %></p>
-                        <a href="<%- url_for(post.path) %>" class="card-glass-link">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                        <div class="card-glass-body">
+                            <span class="card-glass-category"><%= names.join('、') || '未分类' %></span>
+                            <div class="card-glass-meta">
+                                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                                <time datetime="<%= date %>"><%= date %></time>
+                            </div>
+                            <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+                            <p><%= summary %></p>
+                            <a href="<%= url_for(post.path) %>" class="card-glass-link" aria-label="阅读全文：<%= post.title %>">
+                                阅读全文 <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        </div>
                     </div>
-                </div>
-            </article>
-        <% }); %>
-    </div>
+                </article>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <p class="archive-empty" role="status">暂无文章。</p>
+    <% } %>
+
+    <% if (page.total > 1) { %>
+        <nav class="archive-pagination" aria-label="文章分页">
+            <% if (page.prev) { %>
+                <a class="btn-glass" href="<%= url_for(page.prev_link) %>" rel="prev">上一页</a>
+            <% } %>
+            <span>第 <%= page.current %> / <%= page.total %> 页</span>
+            <% if (page.next) { %>
+                <a class="btn-glass" href="<%= url_for(page.next_link) %>" rel="next">下一页</a>
+            <% } %>
+        </nav>
+    <% } %>
 </main>

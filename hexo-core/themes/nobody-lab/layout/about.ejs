@@ -26,46 +26,34 @@
                 </div>
             </div>
 
-            <div class="social-pills">
-                <a href="#" class="btn-glass social-pill"><i class="fab fa-github"></i> GitHub</a>
-                <a href="#" class="btn-glass social-pill"><i class="fab fa-twitter"></i> Twitter</a>
-                <a href="#" class="btn-glass social-pill"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-            </div>
+            <p class="social-status">社交链接待配置</p>
         </div>
 
         <div class="about-text-column">
             <div class="text-card glass-card shift-right">
-                <h3>一位热爱技术的创作者</h3>
-                <p>你好！我是一名全栈开发者与独立创作者，热衷于探索前沿技术、构建优雅的数字产品。我相信技术与艺术的结合能创造无限可能。</p>
-            </div>
-
-            <div class="text-card glass-card shift-left">
-                <p>过去几年中，我参与了多个大型 Web 应用项目，涵盖电商、社交平台和数据可视化等领域。同时，我也在这个博客上分享我的学习心得、项目经验与生活感悟。</p>
+                <h2>个人简介</h2>
+                <% if (page.content?.trim()) { %>
+                    <%- page.content %>
+                <% } else { %>
+                    <p>个人资料待补充。</p>
+                <% } %>
             </div>
 
             <div class="stats-staggered">
                 <div class="stat-card-glass">
-                    <span class="stat-num-glitch" data-target="50">0</span>
-                    <span class="stat-label-glass">+ 文章</span>
-                </div>
-                <div class="stat-card-glass stat-offset">
-                    <span class="stat-num-glitch" data-target="30">0</span>
-                    <span class="stat-label-glass">+ 项目</span>
-                </div>
-                <div class="stat-card-glass">
-                    <span class="stat-num-glitch" data-target="5">0</span>
-                    <span class="stat-label-glass">年经验</span>
+                    <span class="stat-num-glitch" data-target="<%= site.posts.length %>"><%= site.posts.length %></span>
+                    <span class="stat-label-glass">篇文章</span>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="skills-constellation">
-        <h3 class="skills-constellation-title">
+        <h2 class="skills-constellation-title">
             <span class="title-deco-left">◆</span>
-            我的技能
+            技能展示示例
             <span class="title-deco-right">◆</span>
-        </h3>
+        </h2>
         <div class="constellation-map">
             <div class="skill-node" style="--node-x: 10%; --node-y: 15%;">
                 <div class="node-core"><i class="fab fa-vuejs"></i></div>

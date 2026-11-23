@@ -3,51 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%- page.title ? page.title + ' | ' + config.title : config.title %></title>
+    <%
+        const pageName = page.title || (is_tag() ? page.tag : is_category() ? page.category : is_archive() ? '文章' : '');
+        const documentTitle = pageName ? pageName + ' | ' + config.title : config.title;
+        const articleSection = is_archive() || is_post() || is_category() || is_tag();
+    %>
+    <title><%= documentTitle %></title>
     <meta name="description" content="nobody-lab 的个人博客——在确定性之外，寻找未被命名的可能。一个关于技术、生活与思考的独立空间。">
-    <meta property="og:title" content="<%- page.title ? page.title + ' | ' + config.title : config.title %>">
+    <meta property="og:title" content="<%= documentTitle %>">
     <meta property="og:description" content="在确定性之外，寻找未被命名的可能。—— nobody，即无限。">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_CN">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<%- page.title ? page.title + ' | ' + config.title : config.title %>">
+    <meta name="twitter:title" content="<%= documentTitle %>">
     <meta name="twitter:description" content="在确定性之外，寻找未被命名的可能。—— nobody，即无限。">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%234f46e5'/><text x='50%25' y='55%25' text-anchor='middle' dy='.1em' font-size='18' fill='white' font-family='sans-serif' font-weight='bold'>n</text></svg>" />
+    <script src="<%= url_for('site.js') %>"
+        data-apple-style="<%= url_for('style-v2.css') %>" data-acid-style="<%= url_for('style-v3.css') %>"
+        data-apple-script="<%= url_for('script-v2.js') %>" data-acid-script="<%= url_for('script-v3.js') %>"></script>
+    <noscript><link rel="stylesheet" href="<%= url_for('style-v3.css') %>"></noscript>
+    <link rel="stylesheet" href="<%= url_for('site.css') %>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- 动态加载 CSS：根据 localStorage 加载 v2 或 v3 -->
-    <script>
-        (function(){
-            var v = localStorage.getItem('nobody-lab-version') || 'v3';
-            var cssPath = '<%- url_for("/") %>style-' + v + '.css';
-            document.write('<link rel="stylesheet" href="' + cssPath + '">');
-        })();
-    </script>
 </head>
 
 <body class="<%- is_home() ? 'page-home' : is_archive() ? 'page-articles' : is_post() ? 'page-articles' : page.layout === 'projects' ? 'page-projects' : page.layout === 'about' ? 'page-about' : page.layout === 'page' ? 'page-about' : 'page-articles' %>">
 
     <!-- 左上角导航 -->
-    <nav class="glass-nav-vertical">
-        <a href="<%- url_for('/') %>" class="nav-btn-glass <%- is_home() ? 'active' : '' %>">
-            <span class="nav-btn-icon"><i class="fas fa-meteor"></i></span>
+    <nav class="glass-nav-vertical" aria-label="主导航">
+        <a href="<%= url_for('/') %>" class="nav-btn-glass <%= is_home() ? 'active' : '' %>"<% if (is_home()) { %> aria-current="page"<% } %>>
+            <span class="nav-btn-icon" aria-hidden="true"><i class="fas fa-meteor"></i></span>
             <span class="nav-btn-label">首页</span>
         </a>
-        <a href="<%- url_for('/about/') %>" class="nav-btn-glass <%- is_current('about/') ? 'active' : '' %>">
-            <span class="nav-btn-icon"><i class="fas fa-user-astronaut"></i></span>
+        <a href="<%= url_for('about/') %>" class="nav-btn-glass <%= page.layout === 'about' ? 'active' : '' %>"<% if (page.layout === 'about') { %> aria-current="page"<% } %>>
+            <span class="nav-btn-icon" aria-hidden="true"><i class="fas fa-user-astronaut"></i></span>
             <span class="nav-btn-label">关于我</span>
         </a>
-        <a href="<%- url_for('/archives/') %>" class="nav-btn-glass <%- is_archive() || is_post() ? 'active' : '' %>">
-            <span class="nav-btn-icon"><i class="fas fa-scroll"></i></span>
+        <a href="<%= url_for(config.archive_dir + '/') %>" class="nav-btn-glass <%= articleSection ? 'active' : '' %>"<% if (articleSection) { %> aria-current="<%= is_current(config.archive_dir + '/', true) ? 'page' : 'location' %>"<% } %>>
+            <span class="nav-btn-icon" aria-hidden="true"><i class="fas fa-scroll"></i></span>
             <span class="nav-btn-label">文章</span>
         </a>
-        <a href="<%- url_for('/projects/') %>" class="nav-btn-glass <%- page.layout === 'projects' ? 'active' : '' %>">
-            <span class="nav-btn-icon"><i class="fas fa-flask"></i></span>
+        <a href="<%= url_for('projects/') %>" class="nav-btn-glass <%= page.layout === 'projects' ? 'active' : '' %>"<% if (page.layout === 'projects') { %> aria-current="page"<% } %>>
+            <span class="nav-btn-icon" aria-hidden="true"><i class="fas fa-flask"></i></span>
             <span class="nav-btn-label">项目</span>
         </a>
-        <button type="button" class="nav-btn-glass theme-toggle-btn" id="themeToggle" aria-label="切换主题">
-            <span class="nav-btn-icon">
+        <button type="button" class="nav-btn-glass theme-toggle-btn" id="themeToggle" aria-label="浅色主题" aria-pressed="false" disabled>
+            <span class="nav-btn-icon" aria-hidden="true">
                 <i class="fas fa-moon theme-icon-moon"></i>
                 <i class="fas fa-sun theme-icon-sun"></i>
             </span>
@@ -56,10 +57,10 @@
     </nav>
 
     <!-- 阅读进度条 -->
-    <div id="progress-bar"></div>
+    <div id="progress-bar" aria-hidden="true"></div>
 
     <!-- 高饱和旋转背景 -->
-    <div class="vortex-bg">
+    <div class="vortex-bg" aria-hidden="true">
         <div class="vortex-ring ring-a"></div>
         <div class="vortex-ring ring-b"></div>
         <div class="vortex-ring ring-c"></div>
@@ -74,9 +75,9 @@
     <!-- ===== 页脚 ===== -->
     <footer class="footer-minimal">
         <!-- ===== UI 版本切换开关 ===== -->
-        <div class="version-switch-container" id="versionSwitchContainer">
+        <div class="version-switch-container version-v3-active" id="versionSwitchContainer">
             <span class="version-label v2-label">Apple v2</span>
-            <button class="version-toggle" id="versionToggle" aria-label="切换UI版本">
+            <button type="button" class="version-toggle" id="versionToggle" aria-label="Acid v3 界面" aria-pressed="true" disabled>
                 <span class="toggle-thumb"></span>
             </button>
             <span class="version-label v3-label">Acid v3</span>
@@ -88,20 +89,8 @@
             <span class="symbol-circle"></span>
         </div>
         <p class="footer-copy">&copy; 2026 nobody-lab</p>
-        <div class="footer-social-mini">
-            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" aria-label="Bilibili"><i class="fab fa-bilibili"></i></a>
-        </div>
+        <p class="social-status">社交链接待配置</p>
     </footer>
 
-    <!-- 动态加载 JS -->
-    <script>
-        (function(){
-            var v = localStorage.getItem('nobody-lab-version') || 'v3';
-            var jsPath = '<%- url_for("/") %>script-' + v + '.js';
-            document.write('<script src="' + jsPath + '"><\/script>');
-        })();
-    </script>
 </body>
 </html>

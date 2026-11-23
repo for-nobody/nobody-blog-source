@@ -511,7 +511,7 @@ html {
 /* 文字子元素跟随 skew（JS 传入 --skew-x / --skew-y） */
 .glass-card h3,
 .glass-card p,
-.glass-card .card-glass-body h3,
+.glass-card .card-glass-body h2,
 .glass-card .card-glass-body p {
     transform: skew(var(--skew-y, 0deg), var(--skew-x, 0deg));
     transition: none; /* JS 驱动的实时变换，不用 CSS transition */
@@ -1352,7 +1352,7 @@ html {
 .card-glass-surface:hover::after { opacity: 1; }
 
 /* 文字跟随 skew */
-.card-glass-body h3,
+.card-glass-body h2,
 .card-glass-body p,
 .card-glass-body .card-glass-meta {
     transform: skew(var(--skew-y, 0deg), var(--skew-x, 0deg));
@@ -1410,14 +1410,14 @@ html {
 .card-glass-meta { display: flex; gap: 14px; font-size: 0.78rem; color: var(--text-tertiary); margin-bottom: 10px; }
 .card-glass-meta span { display: flex; align-items: center; gap: 4px; }
 
-.card-glass-body h3 {
+.card-glass-body h2 {
     font-size: 1.2rem; font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 8px; line-height: 1.4;
     transition: color 0.2s ease;
 }
 
-.card-glass-surface:hover .card-glass-body h3 { color: var(--text-primary); }
+.card-glass-surface:hover .card-glass-body h2 { color: var(--text-primary); }
 
 .card-glass-body p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 14px; }
 
@@ -1930,7 +1930,7 @@ html {
     }
     /* 移动端不需要文字 skew */
     .glass-card h3, .glass-card p,
-    .card-glass-body h3, .card-glass-body p,
+    .card-glass-body h2, .card-glass-body p,
     .stat-card-glass .stat-num-glitch, .stat-card-glass .stat-label-glass,
     .text-card h3, .text-card p {
         transform: none !important;

@@ -11,6 +11,21 @@
         </div>
     </div>
 
+    <div class="project-tag-sidebar" id="projectTagSidebar" role="group" aria-label="项目分类">
+        <% for (const [index, category, label, icon] of [
+            [0, 'cpp', 'C++', 'fa-code'],
+            [1, 'algorithm', '算法', 'fa-brain'],
+            [2, 'solution', '解决方案', 'fa-lightbulb'],
+            [3, 'liubai', '留白', 'fa-feather']
+        ]) { %>
+            <button type="button" class="btn-glass project-tag-btn" data-category="<%= category %>"
+                data-index="<%= index %>" aria-controls="panel-<%= category %>" aria-pressed="false" disabled>
+                <span class="project-tag-icon" aria-hidden="true"><i class="fas <%= icon %>"></i></span>
+                <span class="project-tag-text"><%= label %></span>
+            </button>
+        <% } %>
+    </div>
+
     <!-- 项目内容面板容器 -->
     <div class="projects-content-area" id="projectsContentArea">
         <!-- 默认空状态 -->
@@ -20,12 +35,12 @@
                     <i class="fas fa-hand-point-right"></i>
                 </div>
                 <h3>选择一个分类标签</h3>
-                <p>点击右侧的分类标签按钮，探索不同领域的项目内容。</p>
+                <p>选择分类，查看对应项目。</p>
             </div>
         </div>
 
         <!-- C++ 面板 -->
-        <div class="project-category-panel" id="panel-cpp" data-category="cpp">
+        <div class="project-category-panel" id="panel-cpp" aria-hidden="true">
             <div class="project-category-header">
                 <span class="category-dot"></span>
                 <h2>C++</h2>
@@ -41,7 +56,7 @@
         </div>
 
         <!-- 算法面板 -->
-        <div class="project-category-panel" id="panel-algorithm" data-category="algorithm">
+        <div class="project-category-panel" id="panel-algorithm" aria-hidden="true">
             <div class="project-category-header">
                 <span class="category-dot"></span>
                 <h2>算法</h2>
@@ -57,7 +72,7 @@
         </div>
 
         <!-- 解决方案面板 -->
-        <div class="project-category-panel" id="panel-solution" data-category="solution">
+        <div class="project-category-panel" id="panel-solution" aria-hidden="true">
             <div class="project-category-header">
                 <span class="category-dot"></span>
                 <h2>解决方案</h2>
@@ -73,7 +88,7 @@
         </div>
 
         <!-- 留白面板 -->
-        <div class="project-category-panel project-panel-liubai" id="panel-liubai" data-category="liubai">
+        <div class="project-category-panel project-panel-liubai" id="panel-liubai" aria-hidden="true">
             <div class="liubai-space">
                 <div class="liubai-orb"></div>
                 <div class="liubai-text">
@@ -87,25 +102,5 @@
     </div>
 </main>
 
-<!-- ===== 右侧半隐藏分类标签 ===== -->
-<div class="project-tag-sidebar" id="projectTagSidebar">
-    <button class="btn-glass project-tag-btn" data-category="cpp" data-index="0">
-        <span class="project-tag-icon"><i class="fas fa-code"></i></span>
-        <span class="project-tag-text">C++</span>
-    </button>
-    <button class="btn-glass project-tag-btn" data-category="algorithm" data-index="1">
-        <span class="project-tag-icon"><i class="fas fa-brain"></i></span>
-        <span class="project-tag-text">算法</span>
-    </button>
-    <button class="btn-glass project-tag-btn" data-category="solution" data-index="2">
-        <span class="project-tag-icon"><i class="fas fa-lightbulb"></i></span>
-        <span class="project-tag-text">解决方案</span>
-    </button>
-    <button class="btn-glass project-tag-btn" data-category="liubai" data-index="3">
-        <span class="project-tag-icon"><i class="fas fa-feather"></i></span>
-        <span class="project-tag-text">留白</span>
-    </button>
-</div>
-
 <!-- ===== 圆形揭示遮罩层 ===== -->
-<div class="circle-reveal-overlay" id="circleRevealOverlay"></div>
+<div class="circle-reveal-overlay" id="circleRevealOverlay" aria-hidden="true"></div>

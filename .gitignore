@@ -56,6 +56,7 @@ $RECYCLE.BIN/
 # ================================
 node_modules/
 package-lock.json
+!/hexo-core/package-lock.json
 yarn.lock
 
 # ================================

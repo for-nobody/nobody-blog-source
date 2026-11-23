@@ -180,261 +180,11 @@ class MagneticPlanet {
     }
 }
 
-// =========================================================================
-// Morph 菜单系统
-// =========================================================================
+(() => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-function initializeMorphMenus() {
-    const morphContainers = document.querySelectorAll(".morph-container");
-
-    morphContainers.forEach((menu) => {
-        menu.addEventListener("click", (e) => {
-            if (e.target.closest(".morph-menu-item")) return;
-
-            const parentCard = menu.closest(".glass-card");
-
-            if (!menu.classList.contains("active")) {
-                morphContainers.forEach((m) => {
-                    if (m !== menu && m.classList.contains("active")) {
-                        m.classList.remove("active");
-                        const mCard = m.closest(".glass-card");
-                        if (mCard) {
-                            setTimeout(() => {
-                                if (!m.classList.contains("active")) {
-                                    mCard.classList.remove("card-active");
-                                }
-                            }, 400);
-                        }
-                    }
-                });
-
-                menu.classList.add("active");
-                if (parentCard) parentCard.classList.add("card-active");
-            }
-        });
-    });
-
-    document.addEventListener("click", (e) => {
-        morphContainers.forEach((menu) => {
-            if (!menu.contains(e.target) && menu.classList.contains("active")) {
-                menu.classList.remove("active");
-                const parentCard = menu.closest(".glass-card");
-                if (parentCard) {
-                    setTimeout(() => {
-                        if (!menu.classList.contains("active")) {
-                            parentCard.classList.remove("card-active");
-                        }
-                    }, 400);
-                }
-            }
-        });
-    });
-}
-
-// =========================================================================
-// DOMContentLoaded 主入口
-// =========================================================================
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    // ==========================================
-    // 1. 粒子背景（移动端减半）
-    // ==========================================
-    const particlesContainer = document.getElementById("particlesContainer");
-    if (particlesContainer) {
-        const isMobile = window.matchMedia("(max-width: 768px)").matches;
-        const particleCount = isMobile ? 40 : 80;
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement("div");
-            particle.classList.add("star-particle");
-            particle.style.left = Math.random() * 100 + "%";
-            particle.style.top = Math.random() * 100 + "%";
-            particle.style.setProperty("--dur", (2 + Math.random() * 6) + "s");
-            particle.style.setProperty("--delay", Math.random() * 5 + "s");
-            particlesContainer.appendChild(particle);
-        }
-    }
-
-    // ==========================================
-    // 2. 数字计数动画
-    // ==========================================
-    function animateCounter(el) {
-        const target = parseInt(el.getAttribute("data-target"));
-        if (isNaN(target)) return;
-
-        let current = 0;
-        const increment = Math.ceil(target / 60);
-        const stepTime = Math.floor(1500 / target);
-
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                el.textContent = target;
-                clearInterval(timer);
-            } else {
-                el.textContent = current;
-            }
-        }, stepTime);
-    }
-
-    const counterObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                animateCounter(entry.target);
-                counterObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.3 });
-
-    document.querySelectorAll(".stat-num-glitch, .stat-number").forEach((el) => {
-        counterObserver.observe(el);
-    });
-
-    // ==========================================
-    // 3. 阅读进度条
-    // ==========================================
-    const progressBar = document.getElementById("progress-bar");
-
-    function updateProgressBar() {
-        if (!progressBar) return;
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-        progressBar.style.width = scrollPercent + "%";
-    }
-
-    window.addEventListener("scroll", updateProgressBar, { passive: true });
-
-    // ==========================================
-    // 4. 深色/浅色模式切换（含 prefers-color-scheme 自动检测）
-    // ==========================================
-    const themeToggle = document.getElementById("themeToggle");
-
-    function applyTheme(theme) {
-        document.documentElement.setAttribute("data-theme", theme);
-    }
-
-    function getCurrentTheme() {
-        return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
-    }
-
-    const savedTheme = localStorage.getItem("nobody-lab-theme");
-    if (savedTheme) {
-        applyTheme(savedTheme);
-    } else {
-        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-        applyTheme(prefersLight ? "light" : "dark");
-    }
-
-    const systemThemeQuery = window.matchMedia("(prefers-color-scheme: light)");
-    systemThemeQuery.addEventListener("change", (e) => {
-        if (!localStorage.getItem("nobody-lab-theme")) {
-            applyTheme(e.matches ? "light" : "dark");
-        }
-    });
-
-    if (themeToggle) {
-        themeToggle.addEventListener("click", () => {
-            const current = getCurrentTheme();
-            const navItem = themeToggle.closest(".nav-btn-glass");
-
-            if (navItem) {
-                navItem.classList.add("rotating");
-                setTimeout(() => navItem.classList.remove("rotating"), 400);
-            }
-
-            const next = current === "light" ? "dark" : "light";
-            applyTheme(next);
-            localStorage.setItem("nobody-lab-theme", next);
-        });
-    }
-
-    // ==========================================
-    // 5. 文章筛选
-    // ==========================================
-    // 5. 文章树状系统 — 引力吸附 + 水珠展开
-    const articleTreeContainer = document.getElementById("articlesTree");
-    if (articleTreeContainer) {
-        const treeTagBtns = articleTreeContainer.querySelectorAll(".tree-tag-btn");
-        const treeDroplets = articleTreeContainer.querySelectorAll(".tree-droplet");
-        const treeBranches = articleTreeContainer.querySelectorAll(".tree-branch");
-        let activeCat = null, dropletState = new Map(), dropletTarget = new Map();
-        let mouseX = -9999, mouseY = -9999, rafId = null;
-        const TRIGGER = 180;
-        let dropletHoverLocked = null; // 鼠标悬停在水珠面板上时锁定该分类，防止关闭
-        treeDroplets.forEach(d => {
-            const c = d.getAttribute("data-category");
-            dropletState.set(c, { s: 0.3, o: 0 }); dropletTarget.set(c, { s: 0.3, o: 0 });
-            // 水珠面板 hover 锁定：鼠标进入水珠 → 锁定分类；离开 → 解锁
-            d.addEventListener("mouseenter", () => { dropletHoverLocked = c; });
-            d.addEventListener("mouseleave", () => { if (dropletHoverLocked === c) dropletHoverLocked = null; });
-        });
-        function btnCenter(btn) { const r = btn.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 }; }
-        function dist(mx, my, btn) { const { cx, cy } = btnCenter(btn); return Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2); }
-        function updateTree() {
-            let bestCat = null, bestD = Infinity;
-            treeTagBtns.forEach(btn => { const c = btn.getAttribute("data-category"), d = dist(mouseX, mouseY, btn); if (d < TRIGGER && d < bestD) { bestD = d; bestCat = c; } });
-            // 双重触发：鼠标靠近按钮 → bestCat；鼠标在水珠面板内 → 锁定保持
-            if (!bestCat && dropletHoverLocked) { bestCat = dropletHoverLocked; bestD = 0; }
-            if (bestCat !== activeCat) {
-                // 旧分类仅在未被锁定时关闭
-                if (activeCat && activeCat !== dropletHoverLocked) dropletTarget.set(activeCat, { s: 0.3, o: 0 });
-                activeCat = bestCat;
-            }
-            if (activeCat) {
-                // 水珠面板被锁定时强制全展开（p=1），否则按距离计算
-                const p = (activeCat === dropletHoverLocked) ? 1 : (1 - Math.min(bestD / TRIGGER, 1));
-                dropletTarget.set(activeCat, { s: 0.3 + 0.7 * p, o: Math.min(1, p * 1.5) });
-            }
-            let anim = false;
-            treeDroplets.forEach(d => {
-                const c = d.getAttribute("data-category"), tgt = dropletTarget.get(c); let st = dropletState.get(c); if (!tgt || !st) return;
-                st.s += (tgt.s - st.s) * 0.18; st.o += (tgt.o - st.o) * 0.18;
-                if (st.o > 0.01) d.classList.add("active"); else d.classList.remove("active");
-                const btn = articleTreeContainer.querySelector('.tree-tag-btn[data-category="' + c + '"]');
-                if (btn && st.o > 0.05) { const { cx, cy } = btnCenter(btn); const cr = articleTreeContainer.getBoundingClientRect(); d.style.left = (cx - cr.left) + "px"; d.style.top = (cy - cr.top - 80) + "px"; d.style.transform = "scale(" + st.s + ") translate(-50%, -100%)"; d.style.opacity = st.o; }
-                else { d.style.transform = "scale(" + st.s + ")"; d.style.opacity = st.o; }
-                if (Math.abs(tgt.s - st.s) > 0.001 || Math.abs(tgt.o - st.o) > 0.001) anim = true;
-            });
-            treeBranches.forEach(b => { const bc = b.getAttribute("data-branch"), tgtS = bc === activeCat ? 1.06 : 1; const cs = parseFloat((b.style.transform || "").replace(/[^0-9.]/g, "") || "1"); const ns = cs + (tgtS - cs) * 0.12; b.style.transform = "scale(" + ns + ")"; b.style.transformOrigin = "center"; if (Math.abs(tgtS - ns) > 0.0005) anim = true; });
-            if (anim) rafId = requestAnimationFrame(updateTree); else rafId = null;
-        }
-        document.addEventListener("mousemove", e => { mouseX = e.clientX; mouseY = e.clientY; if (!rafId) rafId = requestAnimationFrame(updateTree); }, { passive: true });
-        document.addEventListener("mouseleave", () => { mouseX = -9999; mouseY = -9999; dropletHoverLocked = null; if (activeCat) dropletTarget.set(activeCat, { s: 0.3, o: 0 }); activeCat = null; if (!rafId) rafId = requestAnimationFrame(updateTree); });
-    } /*
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    }
-                });
-            });
-        });
-    }
-
-
-
-
-    // ==========================================
-*/    // 6. 卡片鼠标光影追踪
-    // ==========================================
+    // 卡片鼠标光影追踪
     document.querySelectorAll(".card-glass-surface").forEach((card) => {
         card.addEventListener("mousemove", (e) => {
             const rect = card.getBoundingClientRect();
@@ -509,53 +259,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 9. UI 版本切换开关
-    // ==========================================
-    const versionToggle = document.getElementById("versionToggle");
-    const versionContainer = document.getElementById("versionSwitchContainer");
-
-    function updateVersionSwitchUI() {
-        const currentVersion = localStorage.getItem("nobody-lab-version") || "v3";
-        if (versionContainer) {
-            if (currentVersion === "v3") {
-                versionContainer.classList.add("version-v3-active");
-            } else {
-                versionContainer.classList.remove("version-v3-active");
-            }
-        }
-    }
-
-    updateVersionSwitchUI();
-
-    if (versionToggle) {
-        versionToggle.addEventListener("click", () => {
-            const currentVersion = localStorage.getItem("nobody-lab-version") || "v3";
-            const nextVersion = currentVersion === "v3" ? "v2" : "v3";
-            localStorage.setItem("nobody-lab-version", nextVersion);
-            location.reload();
-        });
-    }
-
-    // ==========================================
-    // 10. 键盘快捷键
-    // ==========================================
-    document.addEventListener("keydown", (e) => {
-        if ((e.key === "t" || e.key === "T") && !e.target.matches("input, textarea")) {
-            themeToggle?.click();
-        }
-    });
-
-    // ==========================================
-    // 10. 初始化 Morph 菜单系统
-    // ==========================================
-    initializeMorphMenus();
-
-    // ==========================================
     // 11. 启动宇宙引力吸附引擎 v4.1
     // ==========================================
     const planets = [];
     const targetElements = document.querySelectorAll(
-        ".btn-glass, .nav-btn-glass, .glass-card, .morph-container, .card-glass-surface, .stat-card-glass, .text-card, .social-pill"
+        ".btn-glass:not(.tree-tag-btn, .project-tag-btn), .nav-btn-glass, .glass-card:not(.tree-droplet, .post-content), .card-glass-surface, .stat-card-glass, .text-card"
     );
 
     targetElements.forEach((el) => {
@@ -596,27 +304,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 12. 控制台欢迎信息
-    // ==========================================
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        console.log(
-            "%c nobody-lab v4.1 ACID ",
-            "background: linear-gradient(135deg, #00ff88, #00f0ff, #b829f0, #ffd700); color: #000; font-size: 22px; padding: 12px 24px; border-radius: 8px; font-weight: bold;"
-        );
-        console.log(
-            "%c 酸性设计 v3.1 · 动静分离 · 色彩收敛 · 文字有机跟随",
-            "color: #00ff88; font-size: 14px;"
-        );
-    }
-
-    // ==========================================
     // 13. 项目页面 — 宇宙引力微重力标签吸附系统 v5.0
     //    特征：鼠标邻近检测 → 最近标签弹出 + 微引力Y轴吸附
     //    递归级联动画：最近标签弹至25%时触发相邻标签动画
     // ==========================================
     const projectTagBtns = document.querySelectorAll(".project-tag-btn");
-    const circleOverlay = document.getElementById("circleRevealOverlay");
-    const contentPanels = document.querySelectorAll(".project-category-panel, .project-default-panel");
 
     // ═══════════════════════════════════════════
     // ProjectTagGravitySystem — 核心引力引擎
@@ -901,7 +593,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let tagGravityRAF = null;
     let tagGravityRunning = false;
 
-    if (projectTagBtns.length > 0) {
+    if (projectTagBtns.length > 0 && window.matchMedia("(min-width: 1025px)").matches) {
         tagGravitySystem = new ProjectTagGravitySystem(projectTagBtns);
 
         function tagGravityTick() {
@@ -925,102 +617,4 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }, { passive: true });
     }
-
-    // --- 点击切换逻辑（圆形雾化过渡 + 面板柔滑切换） ---
-    if (projectTagBtns.length > 0 && circleOverlay && contentPanels.length > 0) {
-        let currentActiveTag = null;
-        let isRevealing = false;
-
-        function switchPanel(category) {
-            contentPanels.forEach((panel) => panel.classList.remove("active"));
-            if (category === null) {
-                const defaultPanel = document.getElementById("panel-default");
-                if (defaultPanel) defaultPanel.classList.add("active");
-            } else {
-                const targetPanel = document.getElementById("panel-" + category);
-                if (targetPanel) targetPanel.classList.add("active");
-            }
-        }
-
-        function setActiveTag(btn) {
-            projectTagBtns.forEach((b) => b.classList.remove("tag-active"));
-            if (btn) {
-                btn.classList.add("tag-active");
-                currentActiveTag = btn;
-            } else {
-                currentActiveTag = null;
-            }
-        }
-
-        projectTagBtns.forEach((btn) => {
-            btn.addEventListener("click", (e) => {
-                if (isRevealing) return;
-
-                const isAlreadyActive = btn.classList.contains("tag-active");
-
-                if (isAlreadyActive) {
-                    // 取消选中 → 返回默认面板
-                    isRevealing = true;
-                    const rect = btn.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2;
-                    const cy = rect.top + rect.height / 2;
-
-                    circleOverlay.style.left = cx + "px";
-                    circleOverlay.style.top = cy + "px";
-                    circleOverlay.classList.remove("collapsing");
-                    circleOverlay.classList.add("expanding");
-
-                    // expand 0.4s → 在遮罩峰值时切换面板
-                    setTimeout(() => {
-                        switchPanel(null);
-                        setActiveTag(null);
-                        circleOverlay.classList.remove("expanding");
-                        circleOverlay.classList.add("collapsing");
-
-                        // collapse 0.35s → 清理
-                        setTimeout(() => {
-                            circleOverlay.classList.remove("collapsing");
-                            circleOverlay.style.left = "0px";
-                            circleOverlay.style.top = "0px";
-                            isRevealing = false;
-                        }, 350);
-                    }, 250);
-                } else {
-                    // 选中新分类
-                    isRevealing = true;
-                    const rect = btn.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2;
-                    const cy = rect.top + rect.height / 2;
-
-                    circleOverlay.style.left = cx + "px";
-                    circleOverlay.style.top = cy + "px";
-                    circleOverlay.classList.remove("collapsing");
-                    circleOverlay.classList.add("expanding");
-
-                    // expand 0.4s → 在遮罩峰值时切换面板
-                    setTimeout(() => {
-                        switchPanel(btn.getAttribute("data-category"));
-                        setActiveTag(btn);
-                        circleOverlay.classList.remove("expanding");
-                        circleOverlay.classList.add("collapsing");
-
-                        // collapse 0.35s → 清理
-                        setTimeout(() => {
-                            circleOverlay.classList.remove("collapsing");
-                            circleOverlay.style.left = "0px";
-                            circleOverlay.style.top = "0px";
-                            isRevealing = false;
-                        }, 350);
-                    }, 250);
-                }
-            });
-        });
-
-        // 初始化：默认面板 active
-        const defaultPanel = document.getElementById("panel-default");
-        if (defaultPanel) {
-            defaultPanel.classList.add("active");
-        }
-    }
-
-});
+})();

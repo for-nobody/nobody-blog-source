@@ -1,117 +1,58 @@
-# nobody-lab 🌌
+# nobody-lab
 
 > 在确定性之外，寻找未被命名的可能。—— nobody，即无限。
 
-**nobody-lab** 是我的个人博客与项目展示站点，一个关于技术、生活与思考的独立空间。
+nobody-lab 是个人博客与项目展示站，使用 Hexo、自定义 EJS 主题和原生 CSS、JavaScript。
 
-## ✨ 特性
+## 本地开发
 
-- 🌓 **暗色/亮色主题切换** —— 支持手动切换，默认深色模式
-- 📱 **响应式设计** —— 适配桌面端与移动端
-- 🧭 **毛玻璃导航栏** —— 固定在左上角的垂直导航
-- 📖 **阅读进度条** —— 实时显示页面阅读进度
-- 🚀 **纯静态站点** —— 零依赖，原生 HTML / CSS / JavaScript 构建
-- 🔗 **SEO 友好** —— Open Graph / Twitter Card 元标签
+需要 Node.js 20.19 或更新版本及 npm。在仓库根目录运行以下命令。
 
-## 🛠 技术栈
-
-| 类别 | 技术 |
-|------|------|
-| 结构 | HTML5 |
-| 样式 | CSS3（多版本主题：`style.css` / `style-v2.css` / `style-v3.css`） |
-| 脚本 | 原生 JavaScript（多版本：`script.js` / `script-v2.js` / `script-v3.js`） |
-| 图标 | [Font Awesome 6.5](https://fontawesome.com/) (CDN) |
-| 开发环境 | VS Code + AI API |
-
-## 📁 项目结构
-
-```
-website_demo/
-├── index.html          # 首页
-├── about.html          # 关于我
-├── articles.html       # 文章列表
-├── projects.html       # 项目展示
-├── style.css           # 样式 v1
-├── style-v2.css        # 样式 v2
-├── style-v3.css        # 样式 v3（当前默认）
-├── script.js           # 脚本 v1
-├── script-v2.js        # 脚本 v2
-├── script-v3.js        # 脚本 v3（当前默认）
-├── .gitignore          # Git 忽略规则
-└── README.md           # 项目说明
+```sh
+cd hexo-core
+npm ci
+npm run server
 ```
 
-> 版本通过 `localStorage` 中的 `nobody-lab-version` 键控制，默认加载 `v3`。
+在浏览器打开 `http://localhost:4000/`。用 `npm run clean` 清理生成结果，再用 `npm run build` 生成静态站点到 `hexo-core/public/`。依赖版本由 `hexo-core/package-lock.json` 锁定。Git 会忽略本地依赖、生成页面和 Hexo 数据库。
 
-## 🚀 本地运行
+| 路由 | 内容 |
+| --- | --- |
+| `/` | 首页 |
+| `/about/` | 关于及技能展示 |
+| `/archives/` | 文章归档、树状分类、筛选和分页 |
+| `/projects/` | 项目展示及分类 |
+| `/年/月/日/文章路径/` | 文章详情，可进入分类与标签归档 |
 
-这是一个纯静态网站，无需任何构建工具或服务器。直接用浏览器打开 `index.html` 即可：
+### 界面
 
-```bash
-# 方式一：双击打开
-start index.html
+页脚可在 Apple v2 与 Acid v3 间切换，首次访问默认使用 Acid v3。主导航中的主题按钮单独控制明暗模式，首次访问跟随系统。浏览器在 `nobody-lab-version` 和 `nobody-lab-theme` 中分别保存两项设置。主题位于 `hexo-core/themes/nobody-lab/`，其 `layout/` 和 `source/` 分别存放模板与资源。`_design_backup/` 保存迁移前的静态原型，供视觉与交互参考。
 
-# 方式二：使用 VS Code Live Server 扩展
-# 右键 index.html → "Open with Live Server"
+### 写文章
 
-# 方式三：Python 简易服务器
-python -m http.server 8080
-# 访问 http://localhost:8080
-```
+从 `hexo-core/` 执行 `npx hexo new post "文章标题"`，然后编辑 `source/_posts/` 中生成的 Markdown。以下 front matter 示例为同一篇文章设置两个并列分类。
 
-## 📄 页面说明
-
-| 页面 | 路径 | 说明 |
-|------|------|------|
-| 首页 | `index.html` | 博客入口，展示最新动态与概览 |
-| 关于我 | `about.html` | 个人介绍与技能标签 |
-| 文章 | `articles.html` | 技术文章列表 |
-| 项目 | `projects.html` | 项目展示（C++、算法、解决方案等） |
-
-## 📝 License
-
-本项目采用**双协议**，针对不同内容分别授权：
-
-### 🖥️ 网站源码
-
-本站所有 HTML / CSS / JavaScript 代码基于 **[MIT License](LICENSE)** 开源。
-
-```
-MIT License
-
-Copyright (c) 2026 nobody-lab
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-### 📝 文章及内容
-
-本站所有文章、博文、图片及文字内容遵循 **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)** 协议。
-
-| 标识 | 含义 |
-|------|------|
-| **BY**（署名） | 转载时必须注明原作者及出处 |
-| **NC**（非商业性使用） | 不得将内容用于商业目的 |
-| **SA**（相同方式共享） | 基于此内容创作的衍生作品须采用相同协议发布 |
-
-> 简单来说：你可以自由分享、转载我的文章，但**必须署名、不能商用、且须以相同协议分享**。
-
+```yaml
 ---
+title: 文章标题
+date: 2026-01-10 12:00:00
+categories:
+  - [技术]
+  - [教程]
+tags: [Hexo]
+---
+```
 
-*Made with ❤️ by nobody-lab*
+归档按所属路由分页，树状面板和筛选均作用于当前页。分类名称或 slug 匹配 `技术 / tech`、`生活 / life`、`思考 / thought` 或 `教程 / tutorial` 时归入对应组，英文大小写不敏感。一篇文章可同时进入多组。其余分类与未分类文章可通过「其他 / 未分类」及「全部」找到。标签仍可从文章详情进入独立归档。
+
+### 验证
+
+在 `hexo-core/` 运行 `npm test`，检查干净生成结果、路由、链接及 0、1、13 篇文章的边界。用 `npm run test:browser` 在已安装的 Chrome 或 Edge 中运行浏览器用例。若浏览器安装在自定义路径，将 `CHROME_BIN` 设为可执行文件路径。两套测试均使用隔离的临时站点及锁文件中的依赖，浏览器用例通过回环地址访问测试站点。
+
+## 部署状态
+
+`hexo-core/_config.yml` 的 `url` 目前为 `http://example.com`。生产地址、自定义域名、GitHub Pages 发布方式和上线 SEO 均待部署阶段确认。开发任务和验收记录见 [tasks/README.md](tasks/README.md)。
+
+## 许可
+
+网站源码依据 [MIT License](LICENSE) 授权。本站文章、博文、图片及文字内容按 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh) 授权，转载与改作须署名、限非商业使用，并以相同协议共享衍生作品。

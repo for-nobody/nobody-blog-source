@@ -1,26 +1,19 @@
-<!-- ===== 文章详情页 ===== -->
-<main class="about-main">
-    <div class="about-staggered-title">
-        <h1 class="about-big-title" style="font-size: clamp(2.5rem, 6vw, 5rem); text-align: center; display: block;">
-            <%- page.title %>
-        </h1>
-        <div class="about-title-accent">
-            <span class="accent-line"></span>
-            <span class="accent-text"><%= date(page.date, 'YYYY-MM-DD') %></span>
-            <span class="accent-line"></span>
-        </div>
-        <% if (page.categories && page.categories.length) { %>
-        <div class="about-title-accent" style="margin-top: 4px;">
-            <span style="font-size: 0.85rem; color: var(--text-secondary);">
-                <% page.categories.each(function(cat){ %>
-                    <span style="background: rgba(102,126,234,0.15); padding: 2px 12px; border-radius: 12px; margin: 0 4px;"><%= cat.name %></span>
-                <% }); %>
-            </span>
-        </div>
-        <% } %>
-    </div>
-
-    <div class="post-content glass-card">
-        <%- page.content %>
-    </div>
+<main class="about-main post-main">
+    <article>
+        <header class="about-staggered-title">
+            <h1 class="about-big-title post-title"><%= page.title %></h1>
+            <% const published = date(page.date, 'YYYY-MM-DD'); %>
+            <p class="post-meta"><time datetime="<%= published %>"><%= published %></time></p>
+            <% for (const [label, terms] of [['分类', page.categories], ['标签', page.tags]]) { %>
+                <% if (terms?.length) { %>
+                    <ul class="post-taxonomies" aria-label="<%= label %>">
+                        <% terms.forEach(term => { %>
+                            <li><a href="<%= url_for(term.path) %>"><%= term.name %></a></li>
+                        <% }); %>
+                    </ul>
+                <% } %>
+            <% } %>
+        </header>
+        <div class="post-content glass-card"><%- page.content %></div>
+    </article>
 </main>
