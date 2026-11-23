@@ -1,0 +1,89 @@
+---
+title: "3. 建造第二个窗口"
+date: 2026-11-24 00:00:00
+categories: [教程]
+tags: [Qt]
+---
+
+在 Qt 中实现多窗口，最正规的方法是：**再创建一个 UI 类。**
+
+#### 步骤 1：创建第二个窗口类
+1. 在左侧项目文件夹上**右键** -> **添加新文件... (Add New...)**。
+>	tips:
+>	右键后对应选项为灰色：
+		在 CMake 项目中，Qt Creator 有时会因为 **CMake 尚未完成扫描** 或 **构建目录配置问题**，导致它无法确定新文件应该归属于哪个“目标（Target）”。
+		**qmake 时代：** 只要添加文件，`.pro` 文件会自动更新，它是“全自动”的。
+		**CMake 时代：** 它是“半自动”的。虽然 Qt Creator 尝试帮你自动添加，但如果它没识别到你的项目结构，就会禁用右键菜单。
+		解决方案：
+		方案一：在菜单栏“文件”->“New File”，然后根据本步骤一下面的步骤继续操作，文件创建完成后，在项目文件`CMakeLists.txt`中寻找`set`函数，并将其补充为：
+```txt
+set(PROJECT_SOURCES
+        main.cpp
+        test.cpp
+        test.h
+        test.ui
+        secondwindow.cpp
+        secondwindow.h
+        secondwindow.ui
+)
+```
+>		这段代码的作用是：
+		1. **告知编译器：** 有这两个新文件（`.cpp` 和 `.h`）需要编译。
+		2. **告知 UI 工具：** 有这个 `.ui` 文件需要转换成 C++ 代码。
+		如果你不手动添加，编译器根本不知道 `secondwindow.cpp` 的存在，自然会报“找不到类定义”或者“未定义的引用”之类的错误。
+		方案二：使用 GLOB（通配符）
+		你可以让 CMake 自动搜索文件夹下所有的 `.cpp` 和 `.h`：
+```CMake
+file(GLOB_RECURSE PROJECT_SOURCES 
+    "*.cpp" 
+    "*.h" 
+    "*.ui"
+)
+```
+>		_注意：虽然方便，但**大型项目**不推荐这样做，因为新增文件时 CMake 可能不会立即察觉。_
+>		方案三：执行“清除”并“重新运行 CMake”
+		如果右键菜单是灰色的，尝试：
+		点击菜单栏 **“构建” (Build)** -> **“执行 CMake” (Run CMake)**。
+		这会强制刷新项目结构，通常右键菜单就会恢复正常。
+>注意：方案二与方案三未实践、或是实践不成功。
+2. 选择 **Qt** -> **Qt 设计师界面类 (Qt Designer Form Class)**。
+3. 模板选择 **Widget** 或 **Dialog**（选 Widget 即可）。
+4. 类名改为 `SecondWindow`。
+5. 点击“完成”，你会发现项目里多了 `secondwindow.h`、`secondwindow.cpp` 和 `secondwindow.ui`。
+#### 步骤 2：设计第二个窗口
+双击 `secondwindow.ui`，在里面放一个 Label，写上“这是第二个窗口！”。
+#### 步骤 3：在主窗口中弹出新窗口
+回到你的第一个窗口 `test.h` 和 `test.cpp`。
+**在 `test.h` 中：** 你需要引入头文件并声明这个新窗口的指针。
+```C++
+#include "secondwindow.h" // 1. 包含头文件
+
+// ... 其他代码 ...
+
+private:
+    Ui::test *ui;
+    SecondWindow *s_window; // 2. 定义一个新窗口的指针
+```
+**在 `test.cpp` 的构造函数中：**
+```C++
+test::test(QWidget *parent) : QWidget(parent), ui(new Ui::test) {
+    ui->setupUi(this);
+    s_window = new SecondWindow(); // 3. 实例化新窗口
+}
+```
+**在之前的按钮点击事件中：** 我们将之前的“打招呼”逻辑改为“打开新窗口”：
+```C++
+void test::on_btn_test_clicked() {
+    s_window->show(); // 4. 显示新窗口
+    // this->hide();  // (可选) 如果你想隐藏当前的主窗口，可以加上这一行
+}
+```
+#### 补充：
+- 两种弹出方式的区别
+在 Qt 里弹出窗口有两种“性格”，你需要根据场景选择：
+1. **非模态 (Non-modal):** 就像上面代码里的 `show()`。
+    - **效果：** 新窗口打开了，但你依然可以点击旧窗口。它们是平等的。
+2. **模态 (Modal):** 通常配合 `QDialog` 使用，调用 `exec()`。
+    - **效果：** 新窗口不关，你就点不动旧窗口（就像报错弹窗或者文件保存弹窗）。
+
+欢迎来到本世界的尽头，感到累了吗，那就休息一下吧~(￣▽￣)~*

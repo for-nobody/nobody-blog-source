@@ -3,7 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { setTimeout: delay } = require('node:timers/promises');
 const { openChromium, serve } = require('./chromium.cjs');
-const { buildFixture, lastPost, realPost, expectedGroups } = require('./site-fixture.cjs');
+const { buildFixture, lastPost, singlePostPath, expectedGroups } = require('./site-fixture.cjs');
+const { measureVortex } = require('./vortex.cjs');
 
 const prefix = '/preview/blog';
 const fixtures = [];
@@ -104,19 +105,44 @@ async function run() {
 
   const background = () => evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--bg-deep'));
 
+  async function expectVortex(label) {
+    await waitFor(() => !document.body.getAnimations().some(animation => animation.animationName === 'pageEnter'),
+      [], label + ' pageEnter');
+    const changes = await measureVortex(browser);
+    assert.ok(changes.filter(percent => percent >= 50).length >= 2,
+      label + ' vortex pixel changes by region (%): ' + changes.join(', '));
+    return changes.join('/');
+  }
+
+  async function checkHomeVortex(version, mode) {
+    const label = version + ' ' + mode;
+    const afterEntry = await expectVortex(label + ' after pageEnter');
+    const previous = await evaluate(() => performance.timeOrigin);
+    await send('Page.reload');
+    await ready('/', version, previous);
+    assert.equal((await theme())[0], mode);
+    await delay(5000);
+    const afterReload = await expectVortex(label + ' five seconds after reload');
+    console.log('PASS ' + label + ' vortex pixels (%) after entry ' + afterEntry + ', after reload ' + afterReload);
+  }
+
   await viewport(1440, 900);
   await visit('/', 'v3');
   assert.deepEqual(await theme(), ['dark', 'false']);
   const acidDark = await background();
+  await checkHomeVortex('v3', 'dark');
   await click('#themeToggle');
   assert.deepEqual(await theme(), ['light', 'true']);
   assert.notEqual(await background(), acidDark);
+  await checkHomeVortex('v3', 'light');
   await chooseVersion('/', 'v2');
   assert.deepEqual(await theme(), ['light', 'true']);
   const appleLight = await background();
+  await checkHomeVortex('v2', 'light');
   await click('#themeToggle');
   assert.deepEqual(await theme(), ['dark', 'false']);
   assert.notEqual(await background(), appleLight);
+  await checkHomeVortex('v2', 'dark');
   await click('#themeToggle');
   assert.deepEqual(await theme(), ['light', 'true']);
   await click('.glass-nav-vertical a[href="/about/"]');
@@ -139,16 +165,18 @@ async function run() {
   assert.deepEqual(await theme(), ['light', 'true']);
   console.log('PASS default, v2/v3, theme independence, navigation, reload, history and invalid storage');
 
-  await visit('/archives/', 'v3');
+  await visit('/', 'v3');
+  await click('.glass-nav-vertical a[href="/archives/"]');
+  await ready('/archives/', 'v3');
   await click('[data-filter="other"]');
   assert.equal(await evaluate(() => document.querySelectorAll('.article-card-waterfall:not([hidden])').length), 1);
   await click('[data-filter="tech"]');
   assert.ok(await evaluate(() => !document.querySelector('[data-filter-empty]').hidden));
   await click('[data-filter="all"]');
   await click('.article-card-waterfall h2 a');
-  await ready(realPost, 'v3');
+  await ready(singlePostPath, 'v3');
   assert.equal(await evaluate(() => document.querySelector('.nav-btn-glass.active').getAttribute('href')), '/archives/');
-  console.log('PASS original unclassified post is reachable, empty filter and reset work');
+  console.log('PASS unclassified fixture post is reachable, empty filter and reset work');
 
   const archive = prefix + '/archives/';
   for (const [versionIndex, version] of ['v3', 'v2'].entries()) {
@@ -201,6 +229,7 @@ async function run() {
     await visit(prefix + lastPost, version);
     await evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
     await waitFor(() => parseFloat(document.getElementById('progress-bar').style.width) > 95, [], 'reading progress');
+    await expectVortex(version + ' after scrolling the article');
     assert.ok(await evaluate(() => document.querySelector('.post-content img').naturalWidth > 0));
     assert.ok(await evaluate(() => document.querySelector('.post-content .highlight .code pre').textContent.includes('abcd')));
     const taxonomy = await evaluate(() => decodeURIComponent(new URL(document.querySelector('.post-taxonomies a').href).pathname));
@@ -235,6 +264,7 @@ async function run() {
         }, touch);
         assert.ok(layout.overflow <= 1 && !layout.blocked && layout.navInView,
           version + ' ' + width + ' ' + route + ' ' + JSON.stringify(layout));
+        if (width === 390) await expectVortex(version + ' ' + width + ' reduced motion ' + route);
         if (route === archive && touch) {
           await tap('.tree-tag-btn[data-category="tech"]');
           assert.equal(await evaluate(() => document.getElementById('droplet-tech').hidden), false);

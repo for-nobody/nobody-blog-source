@@ -9,7 +9,15 @@ const project = path.resolve(__dirname, '..');
 const temporaryRoot = fs.realpathSync(os.tmpdir());
 const testTitle = '长标题 <note> & "引号" ' + '可重复验证'.repeat(35);
 const lastPost = '/2026/10/13/fixture-13/';
-const realPost = '/2026/07/05/first/';
+const singlePost = {
+  slug: 'fixture-single',
+  title: '单篇测试文章',
+  date: '2026-10-01',
+  tags: ['日常', '测试'],
+  body: '这篇固定测试文章用于验证 Markdown 到 HTML 的渲染。'
+};
+const singlePostPath = '/' + singlePost.date.replaceAll('-', '/') + '/' + singlePost.slug + '/';
+const fixtureMedia = 'fixture-media';
 const fixtureGroups = [
   [], ['Travel'], [], ['教程'], ['技术'], ['生活'], ['思考'],
   [], ['映射分类'], ['教程'], ['Travel'], ['思考'], ['技术', '生活']
@@ -29,9 +37,19 @@ function removeTemporaryDirectory(directory) {
   fs.rmSync(directory, { recursive: true, force: true, maxRetries: 5 });
 }
 
-function writeManyPosts(directory) {
-  const posts = path.join(directory, 'source', '_posts');
-  fs.rmSync(path.join(posts, 'first.md'));
+function writeSinglePost(posts) {
+  fs.writeFileSync(path.join(posts, singlePost.slug + '.md'), [
+    '---',
+    'title: ' + JSON.stringify(singlePost.title),
+    'date: ' + singlePost.date + ' 12:00:00',
+    'tags: ' + JSON.stringify(singlePost.tags),
+    '---',
+    singlePost.body,
+    ''
+  ].join('\n'));
+}
+
+function writeManyPosts(posts, media) {
   for (const [index, categories] of fixtureGroups.entries()) {
     const day = String(index + 1).padStart(2, '0');
     const title = index === 12 ? testTitle : '测试文章 ' + day;
@@ -51,7 +69,7 @@ function writeManyPosts(directory) {
       '',
       '## Markdown 小节',
       '',
-      '[关于](../../../../about/) 与 ![测试图片](/media/pixel.png)',
+      `[关于](../../../../about/) 与 ![测试图片](/${fixtureMedia}/pixel.png)`,
       '',
       '~~~javascript',
       'const line = "' + 'abcd'.repeat(80) + '";',
@@ -61,7 +79,6 @@ function writeManyPosts(directory) {
     ];
     fs.writeFileSync(path.join(posts, 'fixture-' + day + '.md'), [...metadata, ...lines].join('\n'));
   }
-  const media = path.join(directory, 'source', 'media');
   fs.mkdirSync(media);
   fs.writeFileSync(path.join(media, 'pixel.png'), Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a5ioAAAAASUVORK5CYII=', 'base64'
@@ -69,9 +86,19 @@ function writeManyPosts(directory) {
 }
 
 function buildFixture(count, prefix = '') {
+  assert.ok([0, 1, 13].includes(count), 'unsupported fixture count');
   const directory = createTemporaryDirectory();
   try {
-    for (const name of ['source', 'themes', 'scaffolds']) {
+    const projectSource = path.join(project, 'source');
+    const fixtureSource = path.join(directory, 'source');
+    const fixtureOwned = new Set([path.join(projectSource, '_posts'), path.join(projectSource, fixtureMedia)]);
+    fs.cpSync(projectSource, fixtureSource, { recursive: true, filter: file => !fixtureOwned.has(file) });
+    const posts = path.join(fixtureSource, '_posts');
+    fs.mkdirSync(posts);
+    if (count === 1) writeSinglePost(posts);
+    if (count === 13) writeManyPosts(posts, path.join(fixtureSource, fixtureMedia));
+
+    for (const name of ['themes', 'scaffolds']) {
       fs.cpSync(path.join(project, name), path.join(directory, name), { recursive: true });
     }
     fs.copyFileSync(path.join(project, 'package.json'), path.join(directory, 'package.json'));
@@ -81,9 +108,6 @@ function buildFixture(count, prefix = '') {
     fs.writeFileSync(path.join(directory, '_config.yml'), config);
     fs.symlinkSync(path.join(project, 'node_modules'), path.join(directory, 'node_modules'),
       process.platform === 'win32' ? 'junction' : 'dir');
-    if (count === 0) fs.rmSync(path.join(directory, 'source', '_posts', 'first.md'));
-    if (count === 13) writeManyPosts(directory);
-    assert.ok([0, 1, 13].includes(count), 'unsupported fixture count');
 
     const cli = path.join(project, 'node_modules', 'hexo', 'bin', 'hexo');
     const build = execFileSync(process.execPath, [cli, 'generate'], { cwd: directory, encoding: 'utf8' });
@@ -108,5 +132,5 @@ function page(fixture, route) {
 
 module.exports = {
   buildFixture, page, createTemporaryDirectory, removeTemporaryDirectory,
-  testTitle, lastPost, realPost, expectedGroups, project
+  testTitle, lastPost, singlePost, singlePostPath, expectedGroups, project
 };

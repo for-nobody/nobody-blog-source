@@ -8,6 +8,8 @@ subtitle: ''
 description: 'nobody-lab 的个人博客——在确定性之外，寻找未被命名的可能。'
 keywords:
 author: nobody-lab
+social:
+  github: https://github.com/for-nobody
 language: zh-CN
 timezone: 'Asia/Shanghai'
 

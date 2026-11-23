@@ -26,7 +26,13 @@
                 </div>
             </div>
 
-            <p class="social-status">社交链接待配置</p>
+            <% if (config.social?.github) { %>
+                <div class="social-pills">
+                    <a href="<%= config.social.github %>" class="btn-glass social-pill">
+                        <i class="fab fa-github" aria-hidden="true"></i> GitHub
+                    </a>
+                </div>
+            <% } %>
         </div>
 
         <div class="about-text-column">

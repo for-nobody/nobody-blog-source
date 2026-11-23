@@ -1,0 +1,180 @@
+---
+title: "5. 数据持久化"
+date: 2026-11-24 00:00:00
+categories: [教程]
+tags: [Qt]
+---
+
+让程序记住用户输入的信息，最简单高效的方法就是使用 `QSettings`。它会自动处理 Windows 上的注册表或 Linux 上的 `.conf` 文件。
+#### 1. 核心逻辑
+- **写数据：** 当用户点击按钮或关闭窗口时，把信息存入。
+- **读数据：** 当窗口初始化（构造函数）时，把信息读出来填回 UI。
+#### 2. 代码实现
+假设我们要记住用户在 `inputName` 里输入的文字。
+首先，我们需要在`test.cpp`中添加头文件：`#include <QSettings>`。
+**在 `test.cpp` 的构造函数中（读取数据）：**
+```C++
+test::test(QWidget *parent) : QWidget(parent), ui(new Ui::test) {
+    ui->setupUi(this);
+
+    // 1. 创建对象 (公司名, 软件名)
+    QSettings settings("MyCompany", "MyQtApp");
+
+    // 2. 读取键值为 "userName" 的数据，如果没有，默认为空字符串
+    QString savedName = settings.value("userName", "").toString();
+
+    // 3. 把读到的内容填回输入框
+    ui->inputName->setText(savedName);
+}
+```
+对于此代码的解释：
+1. `QSettings settings("MyCompany", "MyQtApp");`
+	这行代码是在**创建一个“访问权限”**。
+	- **为什么要传两个字符串？** 这相当于告诉操作系统：“我要在你的存储区域开辟一个小仓库，这个仓库属于 **MyCompany（公司/开发者名）** 旗下的 **MyQtApp（软件名）**。”
+	- **它存哪了？**
+	    - 在 **Windows** 上，它会去操作系统的**注册表**里开个房（路径通常是 `HKEY_CURRENT_USER\Software\MyCompany\MyQtApp`）。
+	    - 在 **macOS/Linux** 上，它会生成一个 **.ini** 或 **.conf** 的配置文件。
+	- **每次都要创建吗？** 是的。它并不占资源，它只是一个“接口”。只要这两个名字不变，你无论在程序的哪个窗口调用它，访问的都是同一个“仓库”。
+2. `settings.value("userName", "")`
+	这行代码是在**寻找具体的资料**。
+	- **`"userName"` (键/Key)：** 这是你给资料起的“标签”。你想存名字，就叫它 `userName`；想存音量，可以叫 `volume`。
+	- **`""` (默认值)：** 这是一个“保底机制”**。
+	    - **如果是第一次运行程序**，仓库里根本没有 `userName` 这个东西。
+	    - 为了防止程序崩溃，`value` 函数会返回你设定的这个默认值（这里是空字符串 `""`）。
+3. 最关键的 `.toString()` 是什么意思？
+	这是初学者最容易困惑的地方。在 Qt 中，`QSettings::value()` 返回的不是字符串，也不是整数，而是一种特殊类型：**`QVariant`**。
+	- **为什么要用 QVariant？**
+		因为 `QSettings` 就像一个**万能储物盒**，它不知道你存进去的是什么：
+		- 你可能存了一个名字（字符串）。
+		- 你可能存了一个年龄（整数）。
+		- 你可能存了一个颜色（QColor）。
+		**`QVariant` 是一个“包装箱”**，它把这些不同类型的数据包起来，方便统一管理。
+	- **`.toString()` 的作用：**
+		当你从储物盒里拿出 `QVariant` 包装箱时，编译器并不知道里面是什么。如果你直接把它赋值给 `QString`，编译器会报错。
+		**`.toString()`** 就是在拆箱。它告诉程序：“**我知道这里面是一个字符串，请把它转换成 QString 给我。**”
+		>如果不写`.toString()`，那么编译器会报错“类型不匹配”错误：`test.cpp:16: error: No viable conversion from 'QVariant' to 'QString'`
+4. 举一反三
+	如果你存的是一个整数（比如窗口的宽度），你会这么写：
+```C++
+// 存储一个数字
+settings.setValue("width", 800);
+
+// 读取一个数字
+int w = settings.value("width", 600).toInt(); // 注意：这里用的是 .toInt()
+```
+5. 总结
+	- **`QSettings`**：找到仓库。
+	- **`value`**：根据标签拿出一个“未知的包装盒”。
+	- **`.toString()`**：拆开包装盒，把里面的东西当成字符串拿出来。
+**在点击按钮或某个特定时机（保存数据）：**
+```C++
+void test::on_btn_test_clicked() {
+    // ... 原有的逻辑 ...
+
+    // 1. 创建对象
+    QSettings settings("MyCompany", "MyQtApp");
+
+    // 2. 将当前输入框的内容保存到 "userName" 这个键里
+    settings.setValue("userName", ui->inputName->text());
+}
+```
+#### 3. 原理-它是怎么工作的？
+`QSettings` 会在你的电脑后台创建一个小账本。
+- 在 Windows 上，它通常存在注册表的 `HKEY_CURRENT_USER\Software\MyCompany\MyQtApp`。
+- 你不需要关心文件在哪，Qt 会帮你处理好跨平台的差异。
+#### 4. 例子-让程序自动记住窗口大小
+这个练习非常实用。很多专业软件（如 Photoshop、VS Code）都会记住你上次关闭时窗口的大小。
+要实现这个功能，我们需要用到两个新函数：
+1. **`resize(width, height)`**：改变窗口大小。
+2. **`size()`**：获取当前窗口的大小。
+##### **第一步：在构造函数中“恢复”大小**
+在 `test.cpp` 的构造函数中，读取上次保存的值：
+```C++
+test::test(QWidget *parent) : QWidget(parent), ui(new Ui::test) {
+    ui->setupUi(this);
+
+    QSettings settings("MyCompany", "MyQtApp");
+
+    // 读取宽度和高度，设置默认值为 400x300（防止第一次运行窗口太小）
+    int w = settings.value("windowWidth", 400).toInt();
+    int h = settings.value("windowHeight", 300).toInt();
+
+    // 应用读取到的尺寸
+    this->resize(w, h);
+    
+    // ... 你之前的读取 userName 的代码 ...
+}
+```
+##### **第二步：在关闭窗口时“保存”大小**
+这里有个新知识点：**事件过滤器（Event Handler）**。我们要告诉程序：“在你彻底关闭消失之前，先把现在的尺寸记下来。”
+在 `test.h` 中声明 `closeEvent`_(注意：这里你需要 `#include <QCloseEvent>`)_：
+```C++
+protected:
+    // 这叫“重写”基类的函数，专门处理窗口关闭事件
+    void closeEvent(QCloseEvent *event) override;
+```
+在 `test.cpp` 中实现它 _(注意：这里你也需要 `#include <QCloseEvent>`)_：
+```C++
+#include <QCloseEvent> // 记得加头文件！
+
+void test::closeEvent(QCloseEvent *event) {
+    QSettings settings("MyCompany", "MyQtApp");
+
+    // 保存当前的宽度和高度
+    // this->width() 和 this->height() 能获取当前的像素值
+    settings.setValue("windowWidth", this->width());
+    settings.setValue("windowHeight", this->height());
+
+    // 必须调用基类的处理函数，确保窗口真的能关闭
+    QWidget::closeEvent(event);
+}
+```
+##### 补充：
+1. 为什么不写在按钮点击里？
+	虽然写在按钮点击里也能保存，但用户可能直接点窗口右上角的 `X` 退出。只有写在 `closeEvent` 里，才能确保**无论用户怎么关闭程序，设置都能被存下来**。
+2. 你的进阶思考
+	在这个练习中，你用到了 `.toInt()`。
+	- `settings.value(...)` 返回 `QVariant`。
+	- `resize()` 需要两个 `int` 类型的参数。
+	- 所以我们用 `.toInt()` 进行拆箱。
+#### 5. 例子-让程序记住窗口的位置 (Position Persistence)
+窗口的位置由 `x` 和 `y` 坐标决定（屏幕左上角是 `0,0`）。我们要用到 `pos()` 来获取位置，用 `move()` 来还原位置。
+##### 第一步：修改 `test.cpp` 的构造函数（读取并还原位置）
+```C++
+test::test(QWidget *parent) : QWidget(parent), ui(new Ui::test) {
+    ui->setupUi(this);
+
+    QSettings settings("MyCompany", "MyQtApp");
+
+    // 1. 还原大小（之前的代码）
+    int w = settings.value("windowWidth", 400).toInt();
+    int h = settings.value("windowHeight", 300).toInt();
+    this->resize(w, h);
+
+    // 2. 还原位置 (新的挑战代码)
+    // 默认值设为 100, 100，防止第一次运行在屏幕外面
+    int x = settings.value("windowX", 100).toInt();
+    int y = settings.value("windowY", 100).toInt();
+    this->move(x, y); 
+}
+```
+##### 第二步：修改 `closeEvent`（关闭前保存位置）
+```C++
+void test::closeEvent(QCloseEvent *event) {
+    QSettings settings("MyCompany", "MyQtApp");
+
+    // 保存大小
+    settings.setValue("windowWidth", this->width());
+    settings.setValue("windowHeight", this->height());
+
+    // 保存位置 (新的挑战代码)
+    // this->pos().x() 获取窗口左上角的 X 坐标
+    settings.setValue("windowX", this->pos().x());
+    settings.setValue("windowY", this->pos().y());
+
+    QWidget::closeEvent(event);
+}
+```
+**测试一下：** 运行程序，把窗口拖到屏幕右下角，关闭并重启，看它是不是乖乖回到了刚才消失的地方？
+
+欢迎来到本世界的尽头，如果感觉累了，那么就休息一下吧喵o(〃＾▽＾〃)o

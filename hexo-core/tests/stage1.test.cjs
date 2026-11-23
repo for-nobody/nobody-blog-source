@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { test } = require('node:test');
 const { JSDOM } = require('jsdom');
-const { buildFixture, page, testTitle, lastPost, realPost, expectedGroups, project } = require('./site-fixture.cjs');
+const { buildFixture, page, testTitle, lastPost, singlePost, singlePostPath, expectedGroups, project } = require('./site-fixture.cjs');
 
 function cards(document) {
   return [...document.querySelectorAll('.article-card-waterfall')];
@@ -63,20 +63,20 @@ test('zero posts render the home, archive empty state, about and projects', t =>
   assert.equal(archive.querySelector('#articlesTree'), null);
 });
 
-test('the original Markdown post is visible and linked under all and other', t => {
+test('one fixture post is visible and linked under all and other', t => {
   const fixture = buildFixture(1);
   t.after(fixture.close);
   assert.equal(inspectOutput(fixture).length, 9);
   const archive = page(fixture, '/archives/');
-  assert.deepEqual(cardPaths(archive), [realPost]);
+  assert.deepEqual(cardPaths(archive), [singlePostPath]);
   assert.equal(cards(archive)[0].dataset.category, 'other');
   assert.equal(archive.querySelector('.droplet-article'), null);
   assert.equal(archive.querySelector('article[hidden]'), null);
-  const post = page(fixture, realPost);
-  assert.equal(post.querySelector('h1').textContent, 'My First Post');
-  assert.equal(post.querySelector('time').dateTime, '2026-07-05');
-  assert.match(post.querySelector('.post-content p').textContent, /Hexo/);
-  assert.deepEqual([...post.querySelectorAll('.post-taxonomies li')].map(li => li.textContent.trim()), ['日常', '测试']);
+  const post = page(fixture, singlePostPath);
+  assert.equal(post.querySelector('h1').textContent, singlePost.title);
+  assert.equal(post.querySelector('time').dateTime, singlePost.date);
+  assert.equal(post.querySelector('.post-content p').textContent, singlePost.body);
+  assert.deepEqual([...post.querySelectorAll('.post-taxonomies li')].map(li => li.textContent.trim()), singlePost.tags);
 });
 
 test('13 posts, taxonomy mapping, pagination, escaped text and nested base paths', t => {

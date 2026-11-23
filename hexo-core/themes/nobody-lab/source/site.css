@@ -1,5 +1,7 @@
 [hidden] { display: none !important; }
 html { background-color: var(--bg-deep); }
+/* Keep the negative-z vortex above the body background after pageEnter ends. */
+body { isolation: isolate; }
 
 .btn-glass, .nav-btn-glass, .version-toggle { touch-action: manipulation; }
 
@@ -8,7 +10,6 @@ html { background-color: var(--bg-deep); }
     outline-offset: 3px;
 }
 
-.social-status { color: var(--text-secondary); font-size: 0.85rem; }
 .text-card h2 { font-size: 1.2rem; margin-block-end: 0.5rem; }
 
 .archive-filters, .archive-pagination, .post-taxonomies {
