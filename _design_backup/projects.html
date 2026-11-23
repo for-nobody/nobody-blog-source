@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目 | nobody-lab</title>
+    <meta name="description" content="nobody-lab 的项目展示——C++、算法、解决方案与留白的探索空间。">
+    <meta property="og:title" content="项目 | nobody-lab">
+    <meta property="og:description" content="C++、算法、解决方案与留白——nobody-lab 的项目探索。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="项目 | nobody-lab">
+    <meta name="twitter:description" content="C++、算法、解决方案与留白——nobody-lab 的项目探索。">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%234f46e5'/><text x='50%25' y='55%25' text-anchor='middle' dy='.1em' font-size='18' fill='white' font-family='sans-serif' font-weight='bold'>n</text></svg>" />
+    <script>
+        (function(){var v=localStorage.getItem('nobody-lab-version')||'v3';document.write('<link rel="stylesheet" href="style-'+v+'.css">');})();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="page-projects">
+
+    <!-- ===== 左上角导航 ===== -->
+    <nav class="glass-nav-vertical">
+        <a href="index.html" class="nav-btn-glass">
+            <span class="nav-btn-icon"><i class="fas fa-meteor"></i></span>
+            <span class="nav-btn-label">首页</span>
+        </a>
+        <a href="about.html" class="nav-btn-glass">
+            <span class="nav-btn-icon"><i class="fas fa-user-astronaut"></i></span>
+            <span class="nav-btn-label">关于我</span>
+        </a>
+        <a href="articles.html" class="nav-btn-glass">
+            <span class="nav-btn-icon"><i class="fas fa-scroll"></i></span>
+            <span class="nav-btn-label">文章</span>
+        </a>
+        <a href="projects.html" class="nav-btn-glass active">
+            <span class="nav-btn-icon"><i class="fas fa-flask"></i></span>
+            <span class="nav-btn-label">项目</span>
+        </a>
+        <button type="button" class="nav-btn-glass theme-toggle-btn" id="themeToggle" aria-label="切换主题">
+            <span class="nav-btn-icon">
+                <i class="fas fa-moon theme-icon-moon"></i>
+                <i class="fas fa-sun theme-icon-sun"></i>
+            </span>
+            <span class="nav-btn-label">主题</span>
+        </button>
+    </nav>
+
+    <!-- ===== 阅读进度条 ===== -->
+    <div id="progress-bar"></div>
+
+    <!-- ===== 旋涡背景 ===== -->
+    <div class="vortex-bg">
+        <div class="vortex-ring ring-a"></div>
+        <div class="vortex-ring ring-b"></div>
+        <div class="vortex-ring ring-c"></div>
+        <div class="vortex-ring ring-d"></div>
+        <div class="vortex-core"></div>
+        <div class="vortex-particles" id="particlesContainer"></div>
+    </div>
+
+    <!-- ===== 项目主区域 ===== -->
+    <main class="projects-main">
+        <!-- 默认标题区（始终可见） -->
+        <div class="projects-header">
+            <div class="projects-title-block">
+                <h1 class="projects-big-title">
+                    <span class="proj-title-pre">我的</span>
+                    <span class="proj-title-main">项目</span>
+                </h1>
+                <p class="projects-subtitle">从 C++ 底层到算法设计，从解决方案到留白思考</p>
+            </div>
+        </div>
+
+        <!-- 项目内容面板容器 -->
+        <div class="projects-content-area" id="projectsContentArea">
+            <!-- 默认空状态 -->
+            <div class="project-default-panel active" id="panel-default">
+                <div class="project-placeholder glass-card">
+                    <div class="placeholder-icon">
+                        <i class="fas fa-hand-point-right"></i>
+                    </div>
+                    <h3>选择一个分类标签</h3>
+                    <p>点击右侧的分类标签按钮，探索不同领域的项目内容。</p>
+                </div>
+            </div>
+
+            <!-- C++ 面板 -->
+            <div class="project-category-panel" id="panel-cpp" data-category="cpp">
+                <div class="project-category-header">
+                    <span class="category-dot"></span>
+                    <h2>C++</h2>
+                    <span class="category-dot"></span>
+                </div>
+                <div class="project-empty-state glass-card">
+                    <div class="placeholder-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>暂无项目</h3>
+                    <p>C++ 相关项目即将上线，敬请期待。</p>
+                </div>
+            </div>
+
+            <!-- 算法面板 -->
+            <div class="project-category-panel" id="panel-algorithm" data-category="algorithm">
+                <div class="project-category-header">
+                    <span class="category-dot"></span>
+                    <h2>算法</h2>
+                    <span class="category-dot"></span>
+                </div>
+                <div class="project-empty-state glass-card">
+                    <div class="placeholder-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>暂无项目</h3>
+                    <p>算法相关项目即将上线，敬请期待。</p>
+                </div>
+            </div>
+
+            <!-- 解决方案面板 -->
+            <div class="project-category-panel" id="panel-solution" data-category="solution">
+                <div class="project-category-header">
+                    <span class="category-dot"></span>
+                    <h2>解决方案</h2>
+                    <span class="category-dot"></span>
+                </div>
+                <div class="project-empty-state glass-card">
+                    <div class="placeholder-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>暂无项目</h3>
+                    <p>解决方案相关项目即将上线，敬请期待。</p>
+                </div>
+            </div>
+
+            <!-- 留白面板 -->
+            <div class="project-category-panel project-panel-liubai" id="panel-liubai" data-category="liubai">
+                <div class="liubai-space">
+                    <div class="liubai-orb"></div>
+                    <div class="liubai-text">
+                        <span class="liubai-symbol">∅</span>
+                        <p class="liubai-motto">留白，是未言说的可能性。</p>
+                        <p class="liubai-sub">—— nobody，即无限。</p>
+                    </div>
+                    <div class="liubai-orb liubai-orb-small"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== 右侧半隐藏分类标签 ===== -->
+    <div class="project-tag-sidebar" id="projectTagSidebar">
+        <button class="btn-glass project-tag-btn" data-category="cpp" data-index="0">
+            <span class="project-tag-icon"><i class="fas fa-code"></i></span>
+            <span class="project-tag-text">C++</span>
+        </button>
+        <button class="btn-glass project-tag-btn" data-category="algorithm" data-index="1">
+            <span class="project-tag-icon"><i class="fas fa-brain"></i></span>
+            <span class="project-tag-text">算法</span>
+        </button>
+        <button class="btn-glass project-tag-btn" data-category="solution" data-index="2">
+            <span class="project-tag-icon"><i class="fas fa-lightbulb"></i></span>
+            <span class="project-tag-text">解决方案</span>
+        </button>
+        <button class="btn-glass project-tag-btn" data-category="liubai" data-index="3">
+            <span class="project-tag-icon"><i class="fas fa-feather"></i></span>
+            <span class="project-tag-text">留白</span>
+        </button>
+    </div>
+
+    <!-- ===== 圆形揭示遮罩层 ===== -->
+    <div class="circle-reveal-overlay" id="circleRevealOverlay"></div>
+
+    <!-- ===== 页脚 ===== -->
+    <footer class="footer-minimal">
+        <div class="footer-symbol">
+            <span class="symbol-circle"></span>
+            <span class="symbol-text">nobody-lab</span>
+            <span class="symbol-circle"></span>
+        </div>
+        <p class="footer-copy">&copy; 2026 nobody-lab</p>
+    </footer>
+
+    <script>
+        (function(){var v=localStorage.getItem('nobody-lab-version')||'v3';document.write('<script src="script-'+v+'.js"><\/script>');})();
+    </script>
+</body>
+</html>

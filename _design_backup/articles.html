@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章 | nobody-lab</title>
+    <meta name="description" content="nobody-lab 的文章列表——探索技术深度，分享生活温度。涵盖技术、生活、思考、教程等分类。">
+    <meta property="og:title" content="文章 | nobody-lab">
+    <meta property="og:description" content="探索技术深度，分享生活温度——技术、生活、思考、教程。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="文章 | nobody-lab">
+    <meta name="twitter:description" content="探索技术深度，分享生活温度——技术、生活、思考、教程。">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%234f46e5'/><text x='50%25' y='55%25' text-anchor='middle' dy='.1em' font-size='18' fill='white' font-family='sans-serif' font-weight='bold'>n</text></svg>" />
+    <script>
+        (function(){var v=localStorage.getItem('nobody-lab-version')||'v3';document.write('<link rel="stylesheet" href="style-'+v+'.css">');})();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="page-articles">
+
+    <!-- ===== 左上角导航 ===== -->
+    <nav class="glass-nav-vertical">
+        <a href="index.html" class="nav-btn-glass">
+            <span class="nav-btn-icon"><i class="fas fa-meteor"></i></span>
+            <span class="nav-btn-label">首页</span>
+        </a>
+        <a href="about.html" class="nav-btn-glass">
+            <span class="nav-btn-icon"><i class="fas fa-user-astronaut"></i></span>
+            <span class="nav-btn-label">关于我</span>
+        </a>
+        <a href="articles.html" class="nav-btn-glass active">
+            <span class="nav-btn-icon"><i class="fas fa-scroll"></i></span>
+            <span class="nav-btn-label">文章</span>
+        </a>
+        <a href="projects.html" class="nav-btn-glass">
+            <span class="nav-btn-icon"><i class="fas fa-flask"></i></span>
+            <span class="nav-btn-label">项目</span>
+        </a>
+        <button type="button" class="nav-btn-glass theme-toggle-btn" id="themeToggle" aria-label="切换主题">
+            <span class="nav-btn-icon">
+                <i class="fas fa-moon theme-icon-moon"></i>
+                <i class="fas fa-sun theme-icon-sun"></i>
+            </span>
+            <span class="nav-btn-label">主题</span>
+        </button>
+    </nav>
+
+    <!-- ===== 阅读进度条 ===== -->
+    <div id="progress-bar"></div>
+
+    <!-- ===== 高饱和旋转背景 ===== -->
+    <div class="vortex-bg">
+        <div class="vortex-ring ring-a"></div>
+        <div class="vortex-ring ring-b"></div>
+        <div class="vortex-ring ring-c"></div>
+        <div class="vortex-ring ring-d"></div>
+        <div class="vortex-core"></div>
+        <div class="vortex-particles" id="particlesContainer"></div>
+    </div>
+
+    <!-- ===== 文章区域 ===== -->
+    <main class="articles-main">
+        <div class="articles-header">
+            <div class="articles-title-block">
+                <h1 class="articles-big-title">
+                    <span class="art-title-pre">最新</span>
+                    <span class="art-title-main">文章</span>
+                </h1>
+                <p class="articles-subtitle">探索技术深度，分享生活温度</p>
+            </div>
+        </div>
+
+        <!-- 树状分类系统 -->
+        <div class="articles-tree-container" id="articlesTree">
+            <svg class="tree-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
+                <path class="tree-trunk" d="M 120 720 Q 280 530, 430 380 Q 520 290, 600 180"/>
+                <path class="tree-branch" data-branch="tech" d="M 365 495 Q 480 450, 600 435"/>
+                <path class="tree-branch" data-branch="life" d="M 435 380 Q 340 310, 220 275"/>
+                <path class="tree-branch" data-branch="thought" d="M 525 260 Q 640 210, 750 195"/>
+                <path class="tree-branch" data-branch="tutorial" d="M 575 195 Q 500 130, 390 105"/>
+                <circle class="tree-node tree-node-root" cx="120" cy="720" r="4"/>
+                <circle class="tree-node tree-node-tip" cx="600" cy="180" r="3"/>
+            </svg>
+            <button class="btn-glass tree-tag-btn" data-category="tech" style="--btn-x:68%;--btn-y:46%;"><i class="fas fa-laptop-code"></i> <span>技术</span></button>
+            <button class="btn-glass tree-tag-btn" data-category="life" style="--btn-x:14%;--btn-y:27%;"><i class="fas fa-heart"></i> <span>生活</span></button>
+            <button class="btn-glass tree-tag-btn" data-category="thought" style="--btn-x:82%;--btn-y:17%;"><i class="fas fa-lightbulb"></i> <span>思考</span></button>
+            <button class="btn-glass tree-tag-btn" data-category="tutorial" style="--btn-x:32%;--btn-y:6%;"><i class="fas fa-graduation-cap"></i> <span>教程</span></button>
+
+            <!-- 水珠面板：技术 -->
+            <div class="tree-droplet" data-category="tech" id="droplet-tech">
+                <div class="droplet-inner">
+                    <div class="droplet-articles">
+                        <div class="droplet-article"><span class="droplet-title">深入理解 JavaScript 异步编程</span><span class="droplet-keywords"><span class="kw-tag">async/await</span><span class="kw-tag">Promise</span></span></div>
+                        <div class="droplet-article"><span class="droplet-title">WebAssembly 入门与实践指南</span><span class="droplet-keywords"><span class="kw-tag">WASM</span><span class="kw-tag">性能优化</span></span></div>
+                        <div class="droplet-article"><span class="droplet-title">Docker 容器化部署最佳实践</span><span class="droplet-keywords"><span class="kw-tag">Docker</span><span class="kw-tag">DevOps</span></span></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 水珠面板：生活 -->
+            <div class="tree-droplet" data-category="life" id="droplet-life">
+                <div class="droplet-inner">
+                    <div class="droplet-articles">
+                        <div class="droplet-article"><span class="droplet-title">2026 上半年读书清单与推荐</span><span class="droplet-keywords"><span class="kw-tag">阅读</span><span class="kw-tag">书单</span></span></div>
+                        <div class="droplet-article"><span class="droplet-title">远程办公两年后的思考</span><span class="droplet-keywords"><span class="kw-tag">远程工作</span><span class="kw-tag">生活方式</span></span></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 水珠面板：思考 -->
+            <div class="tree-droplet" data-category="thought" id="droplet-thought">
+                <div class="droplet-inner">
+                    <div class="droplet-articles">
+                        <div class="droplet-article"><span class="droplet-title">技术与人文的交汇点</span><span class="droplet-keywords"><span class="kw-tag">哲学</span><span class="kw-tag">技术伦理</span></span></div>
+                        <div class="droplet-article"><span class="droplet-title">AI 时代程序员的自我修养</span><span class="droplet-keywords"><span class="kw-tag">AI</span><span class="kw-tag">职业发展</span></span></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 水珠面板：教程 -->
+            <div class="tree-droplet" data-category="tutorial" id="droplet-tutorial">
+                <div class="droplet-inner">
+                    <div class="droplet-articles">
+                        <div class="droplet-article"><span class="droplet-title">从零开始：用 Three.js 构建 3D 交互页面</span><span class="droplet-keywords"><span class="kw-tag">Three.js</span><span class="kw-tag">3D</span></span></div>
+                        <div class="droplet-article"><span class="droplet-title">React 18 新特性全面解析</span><span class="droplet-keywords"><span class="kw-tag">React</span><span class="kw-tag">前端</span></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>.page-articles main+main,.page-articles main~.articles-waterfall{display:none!important}</style>
+    </main>
+    <main class="articles-main">
+        <div class="articles-header">
+            <div class="articles-title-block">
+                <h1 class="articles-big-title">
+                    <span class="art-title-pre">最新</span>
+                    <span class="art-title-main">文章</span>
+                </h1>
+                <p class="articles-subtitle">探索技术深度，分享生活温度</p>
+            </div>
+
+            <!-- filter-wave removed -->
+                <button class="btn-glass filter-pill active" data-filter="all">
+                    <i class="fas fa-globe-asia"></i> 全部
+                </button>
+                <button class="btn-glass filter-pill" data-filter="tech">
+                    <i class="fas fa-laptop-code"></i> 技术
+                </button>
+                <button class="btn-glass filter-pill" data-filter="life">
+                    <i class="fas fa-camera-retro"></i> 生活
+                </button>
+                <button class="btn-glass filter-pill" data-filter="thought">
+                    <i class="fas fa-brain"></i> 思考
+                </button>
+                <button class="btn-glass filter-pill" data-filter="tutorial">
+                    <i class="fas fa-graduation-cap"></i> 教程
+                </button>
+            </div>
+        </div>
+
+        <div class="articles-waterfall">
+            <article class="article-card-waterfall card-size-lg" data-category="tech">
+                <div class="card-glass-surface">
+                    <div class="card-glass-image" style="--card-gradient: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="card-glass-body">
+                        <span class="card-glass-category">技术</span>
+                        <div class="card-glass-meta">
+                            <span><i class="far fa-calendar-alt"></i> 2026-06-20</span>
+                            <span><i class="far fa-comment"></i> 12 评论</span>
+                        </div>
+                        <h3>构建高性能 Web 应用的最佳实践</h3>
+                        <p>深入探讨现代 Web 应用性能优化的关键策略，从代码分割到缓存策略全面解析。</p>
+                        <a href="#" class="card-glass-link">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="article-card-waterfall card-size-md card-offset-right" data-category="life">
+                <div class="card-glass-surface">
+                    <div class="card-glass-image" style="--card-gradient: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <div class="card-glass-body">
+                        <span class="card-glass-category">生活</span>
+                        <div class="card-glass-meta">
+                            <span><i class="far fa-calendar-alt"></i> 2026-06-18</span>
+                            <span><i class="far fa-comment"></i> 8 评论</span>
+                        </div>
+                        <h3>在旅途中寻找灵感：京都之行的思考</h3>
+                        <p>一次短暂的旅行，让我重新思考了生活方式与创作之间的关系。</p>
+                        <a href="#" class="card-glass-link">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="article-card-waterfall card-size-sm" data-category="thought">
+                <div class="card-glass-surface">
+                    <div class="card-glass-image" style="--card-gradient: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="card-glass-body">
+                        <span class="card-glass-category">思考</span>
+                        <div class="card-glass-meta">
+                            <span><i class="far fa-calendar-alt"></i> 2026-06-15</span>
+                            <span><i class="far fa-comment"></i> 20 评论</span>
+                        </div>
+                        <h3>AI 时代下的程序员：进化还是消亡</h3>
+                        <p>当 AI 能够编写代码，程序员的未来在哪里？</p>
+                        <a href="#" class="card-glass-link">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="article-card-waterfall card-size-md" data-category="tutorial">
+                <div class="card-glass-surface">
+                    <div class="card-glass-image" style="--card-gradient: linear-gradient(135deg, #a18cd1, #fbc2eb);">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="card-glass-body">
+                        <span class="card-glass-category">教程</span>
+                        <div class="card-glass-meta">
+                            <span><i class="far fa-calendar-alt"></i> 2026-06-10</span>
+                            <span><i class="far fa-comment"></i> 15 评论</span>
+                        </div>
+                        <h3>从零开始：用 Three.js 构建 3D 交互页面</h3>
+                        <p>手把手教程，带你入门 Three.js，创建令人惊叹的 3D 网页体验。</p>
+                        <a href="#" class="card-glass-link">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="article-card-waterfall card-size-sm card-offset-left" data-category="tech">
+                <div class="card-glass-surface">
+                    <div class="card-glass-image" style="--card-gradient: linear-gradient(135deg, #fa709a, #fee140);">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <div class="card-glass-body">
+                        <span class="card-glass-category">技术</span>
+                        <div class="card-glass-meta">
+                            <span><i class="far fa-calendar-alt"></i> 2026-06-05</span>
+                            <span><i class="far fa-comment"></i> 6 评论</span>
+                        </div>
+                        <h3>微服务架构下的分布式追踪实战</h3>
+                        <p>使用 OpenTelemetry 和 Jaeger 构建分布式追踪系统。</p>
+                        <a href="#" class="card-glass-link">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="article-card-waterfall card-size-lg" data-category="life">
+                <div class="card-glass-surface">
+                    <div class="card-glass-image" style="--card-gradient: linear-gradient(135deg, #5ee7df, #b490ca);">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="card-glass-body">
+                        <span class="card-glass-category">生活</span>
+                        <div class="card-glass-meta">
+                            <span><i class="far fa-calendar-alt"></i> 2026-06-01</span>
+                            <span><i class="far fa-comment"></i> 10 评论</span>
+                        </div>
+                        <h3>2026 上半年读书清单与推荐</h3>
+                        <p>上半年读过的 15 本好书精选推荐，涵盖技术、哲学、小说与自我提升类书籍。</p>
+                        <a href="#" class="card-glass-link">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer class="footer-minimal">
+        <div class="footer-symbol">
+            <span class="symbol-circle"></span>
+            <span class="symbol-text">nobody-lab</span>
+            <span class="symbol-circle"></span>
+        </div>
+        <p class="footer-copy">&copy; 2026 nobody-lab</p>
+    </footer>
+
+    <script>
+        (function(){var v=localStorage.getItem('nobody-lab-version')||'v3';document.write('<script src="script-'+v+'.js"><\/script>');})();
+    </script>
+</body>
+</html>
