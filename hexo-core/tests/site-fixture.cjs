@@ -19,13 +19,14 @@ const singlePost = {
 const singlePostPath = '/' + singlePost.date.replaceAll('-', '/') + '/' + singlePost.slug + '/';
 const fixtureMedia = 'fixture-media';
 const fixtureGroups = [
-  [], ['Travel'], [], ['教程'], ['技术'], ['生活'], ['思考'],
+  [], ['Travel'], ['教程'], ['教程'], ['技术'], ['生活'], ['思考'],
   [], ['映射分类'], ['教程'], ['Travel'], ['思考'], ['技术', '生活']
 ];
 const expectedGroups = [
-  [], [], [], ['tutorial'], ['tech'], ['life'], ['thought'],
+  [], [], ['tutorial'], ['tutorial'], ['tech'], ['life'], ['thought'],
   [], ['tech'], ['tutorial'], [], ['thought'], ['tech', 'life']
 ];
+const expectedArchiveOrder = [13, 12, 11, 10, 9, 8, 7, 6, 5, 3, 4, 2, 1];
 
 function createTemporaryDirectory() {
   return fs.mkdtempSync(path.join(temporaryRoot, 'nobody-stage1-'));
@@ -50,13 +51,19 @@ function writeSinglePost(posts) {
 }
 
 function writeManyPosts(posts, media) {
+  // These posts share a site day but have different times and straddle the page boundary.
+  const sameDayDates = {
+    '03': '2026-10-03 02:00:00',
+    '04': '2026-10-03 23:45:00'
+  };
   for (const [index, categories] of fixtureGroups.entries()) {
-    const day = String(index + 1).padStart(2, '0');
-    const title = index === 12 ? testTitle : '测试文章 ' + day;
+    const number = String(index + 1).padStart(2, '0');
+    const title = index === 12 ? testTitle : '测试文章 ' + number;
+    const date = sameDayDates[number] ?? `2026-10-${number} 12:00:00`;
     const metadata = [
       '---',
       'title: ' + JSON.stringify(title),
-      'date: 2026-10-' + day + ' 12:00:00',
+      'date: ' + date,
       'categories: ' + JSON.stringify(categories.map(category => [category])),
       'tags: ["标签", "verification"]',
       '---',
@@ -71,13 +78,15 @@ function writeManyPosts(posts, media) {
       '',
       `[关于](../../../../about/) 与 ![测试图片](/${fixtureMedia}/pixel.png)`,
       '',
+      '{% post_link fixture-04 %}',
+      '',
       '~~~javascript',
       'const line = "' + 'abcd'.repeat(80) + '";',
       '~~~',
       '',
       ...Array(24).fill('用于验证滚动阅读进度的测试段落。\n')
     ];
-    fs.writeFileSync(path.join(posts, 'fixture-' + day + '.md'), [...metadata, ...lines].join('\n'));
+    fs.writeFileSync(path.join(posts, 'fixture-' + number + '.md'), [...metadata, ...lines].join('\n'));
   }
   fs.mkdirSync(media);
   fs.writeFileSync(path.join(media, 'pixel.png'), Buffer.from(
@@ -132,5 +141,5 @@ function page(fixture, route) {
 
 module.exports = {
   buildFixture, page, createTemporaryDirectory, removeTemporaryDirectory,
-  testTitle, lastPost, singlePost, singlePostPath, expectedGroups, project
+  testTitle, lastPost, singlePost, singlePostPath, expectedGroups, expectedArchiveOrder, project
 };

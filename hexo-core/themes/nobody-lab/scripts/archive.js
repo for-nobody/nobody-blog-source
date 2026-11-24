@@ -1,4 +1,32 @@
 const { unescapeHTML } = require('hexo-util');
+const { posix } = require('node:path');
+
+const { timezone } = hexo.config;
+if (timezone) {
+  // Split archive years and months in the same timezone used for display.
+  const getPosts = hexo.locals.getters.posts;
+  hexo.locals.set('posts', () => {
+    const posts = getPosts();
+    posts.forEach(post => post.date.tz(timezone));
+    return posts;
+  });
+
+  // Tags such as post_link look up posts directly in the model.
+  hexo.extend.filter.register('post_permalink', post => {
+    const data = Object.create(Object.getPrototypeOf(post), Object.getOwnPropertyDescriptors(post));
+    data.date = post.date.clone().tz(timezone);
+    return data;
+  }, 1);
+}
+
+// The archive and taxonomy generators sort posts before splitting them into pages.
+const postSchema = hexo.model('Post').schema;
+postSchema.virtual('archive_day', function () {
+  return this.date.clone().startOf('day').valueOf();
+});
+postSchema.virtual('archive_filename', function () {
+  return posix.basename(this.source);
+});
 
 const categories = [
   { key: 'all', label: '全部', icon: 'fa-globe-asia' },

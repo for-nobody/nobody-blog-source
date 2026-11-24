@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { setTimeout: delay } = require('node:timers/promises');
 const { openChromium, serve } = require('./chromium.cjs');
-const { buildFixture, lastPost, singlePostPath, expectedGroups } = require('./site-fixture.cjs');
+const { buildFixture, lastPost, singlePostPath, expectedGroups, expectedArchiveOrder } = require('./site-fixture.cjs');
 const { measureVortex } = require('./vortex.cjs');
 
 const prefix = '/preview/blog';
@@ -184,7 +184,7 @@ async function run() {
     if (versionIndex) await chooseVersion(archive, version);
     for (const key of ['tech', 'life', 'thought', 'tutorial', 'other', 'all']) {
       await click('[data-filter="' + key + '"]');
-      const expected = expectedGroups.slice(-10).filter(groups =>
+      const expected = expectedArchiveOrder.slice(0, 10).map(number => expectedGroups[number - 1]).filter(groups =>
         key === 'all' || groups.includes(key) || (key === 'other' && !groups.length)).length;
       const state = await evaluate(() => ({
         visible: document.querySelectorAll('.article-card-waterfall:not([hidden])').length,

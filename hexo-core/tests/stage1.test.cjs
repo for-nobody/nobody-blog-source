@@ -4,7 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { test } = require('node:test');
 const { JSDOM } = require('jsdom');
-const { buildFixture, page, testTitle, lastPost, singlePost, singlePostPath, expectedGroups, project } = require('./site-fixture.cjs');
+const {
+  buildFixture, page, testTitle, lastPost, singlePost, singlePostPath, expectedGroups, expectedArchiveOrder, project
+} = require('./site-fixture.cjs');
 
 function cards(document) {
   return [...document.querySelectorAll('.article-card-waterfall')];
@@ -12,6 +14,10 @@ function cards(document) {
 
 function cardPaths(document) {
   return cards(document).map(card => card.querySelector('h2 a').getAttribute('href'));
+}
+
+function fixtureNumbers(document) {
+  return cardPaths(document).map(href => Number(href.match(/\/fixture-(\d{2})\/$/)[1]));
 }
 
 function inspectOutput(fixture) {
@@ -79,7 +85,7 @@ test('one fixture post is visible and linked under all and other', t => {
   assert.deepEqual([...post.querySelectorAll('.post-taxonomies li')].map(li => li.textContent.trim()), singlePost.tags);
 });
 
-test('13 posts, taxonomy mapping, pagination, escaped text and nested base paths', t => {
+test('13 posts, same-day ordering, taxonomy mapping, pagination, escaped text and nested base paths', t => {
   const fixture = buildFixture(13, '/preview/blog');
   t.after(fixture.close);
   const routes = inspectOutput(fixture);
@@ -90,9 +96,12 @@ test('13 posts, taxonomy mapping, pagination, escaped text and nested base paths
   assert.equal(first.querySelector('[rel=next]').getAttribute('href'), fixture.prefix + '/archives/page/2/');
   assert.equal(second.querySelector('[rel=prev]').getAttribute('href'), fixture.prefix + '/archives/');
   const allCards = [...cards(first), ...cards(second)];
-  assert.equal(new Set([...cardPaths(first), ...cardPaths(second)]).size, 13);
+  assert.deepEqual(fixtureNumbers(first), expectedArchiveOrder.slice(0, 10));
+  assert.deepEqual(fixtureNumbers(second), expectedArchiveOrder.slice(10));
+  const latePost = fixture.prefix + '/2026/10/03/fixture-04/';
+  assert.equal(cardPaths(second)[0], latePost);
   for (const [index, card] of allCards.entries()) {
-    const expected = expectedGroups[12 - index];
+    const expected = expectedGroups[expectedArchiveOrder[index] - 1];
     assert.deepEqual(card.dataset.category.split(' ').sort(), expected.length ? [...expected].sort() : ['other']);
   }
   assert.deepEqual([...first.querySelectorAll('.tree-category')].map(group => [
@@ -118,6 +127,7 @@ test('13 posts, taxonomy mapping, pagination, escaped text and nested base paths
   assert.ok(detail.querySelector('.post-content h2'));
   assert.ok(detail.querySelector('.post-content .highlight pre'));
   assert.ok(detail.querySelector('.post-content img'));
+  assert.ok(detail.querySelector(`.post-content a[href="${latePost}"]`));
   const taxonomy = [...detail.querySelectorAll('.post-taxonomies a')].map(a => [
     a.textContent, a.getAttribute('href')
   ]);
@@ -126,7 +136,11 @@ test('13 posts, taxonomy mapping, pagination, escaped text and nested base paths
     assert.equal(archive.querySelector('h1').textContent.trim(), name);
     assert.ok(cardPaths(archive).includes(fixture.prefix + lastPost));
   }
+  for (const route of ['/archives/2026/', '/archives/2026/10/', '/tags/标签/']) {
+    assert.deepEqual(fixtureNumbers(page(fixture, route)), expectedArchiveOrder.slice(0, 10), route);
+    assert.deepEqual(fixtureNumbers(page(fixture, route + 'page/2/')), expectedArchiveOrder.slice(10), route);
+  }
   const tagged = page(fixture, '/tags/标签/page/2/');
-  assert.equal(cards(tagged).length, 3);
   assert.equal(tagged.querySelector('h1').textContent.trim(), '标签');
+  assert.deepEqual(fixtureNumbers(page(fixture, '/categories/教程/')), [10, 3, 4]);
 });
