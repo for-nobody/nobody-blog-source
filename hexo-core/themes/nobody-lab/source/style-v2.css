@@ -959,6 +959,8 @@ html {
     animation: nodePing 1.5s ease-out infinite;
 }
 
+[data-theme="light"] .skill-node .node-core { color: var(--text-secondary); }
+
 @keyframes nodePing {
     0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.5); }
     70% { box-shadow: 0 0 0 20px transparent; }
